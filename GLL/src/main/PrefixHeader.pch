@@ -1,0 +1,28 @@
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+
+#define GL_SILENCE_DEPRECATION
+#define WINDOW_WIDTH (1280)
+#define WINDOW_HEIGHT (720)
+
+#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
+#include <GLFW/glfw3.h>
+#include <GLUT/GLUT.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+
+#define INSTANCE_DRAW_ENABLED (1)
+#define CUSTOM_CULL_FACE_ENABLED (1)
+#define GL_CULL_FACE_ENABLED (1)
+
+#define POLYGON_LINE_ENAGLED (0)
+
+#define AABB_TEST_ENABLED (0)
+#define TEXT_RENDER_ENABLED (0)
+
+#endif /* PrefixHeader_pch */

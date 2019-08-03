@@ -1,0 +1,5 @@
+/System/Volumes/Data/Users/liuwei/Desktop/GLL/freetype/build/CMakeFiles/install.dir
+/System/Volumes/Data/Users/liuwei/Desktop/GLL/freetype/build/CMakeFiles/package.dir
+/System/Volumes/Data/Users/liuwei/Desktop/GLL/freetype/build/CMakeFiles/freetype.dir
+/System/Volumes/Data/Users/liuwei/Desktop/GLL/freetype/build/CMakeFiles/ALL_BUILD.dir
+/System/Volumes/Data/Users/liuwei/Desktop/GLL/freetype/build/CMakeFiles/ZERO_CHECK.dir
