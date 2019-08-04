@@ -29,7 +29,6 @@ namespace GLL {
         void updateBlockId(const BlockId& blockId);
         void drawBlock(Shader& shader);
         
-        
         void setParentSection(ChunkSection* section);
         glm::vec3 getBlockPositonInWorld() const;
         glm::vec3 getBlockPositionInSection() const;
@@ -48,13 +47,14 @@ namespace GLL {
         ChunkSection* parentSection;
         glm::vec3 blockPositionInSection;
         glm::vec3 blockPositonInWorld;
-        std::vector<std::shared_ptr<ChunkMesh>> meshes;
         
+        std::vector<std::shared_ptr<ChunkMesh>> meshes;
+        std::vector<InstanceMesh> instanceMeshes;
+
         bool hasMeshMade = false;
         bool hasMeshBuffered = false;
         bool hasMadeInstanceMeshes = false;
         
-        std::vector<InstanceMesh> instanceMeshes;
         
         BlockId getUpBlock();
         BlockId getDownBlock();
@@ -62,7 +62,6 @@ namespace GLL {
         BlockId getRightBlock();
         BlockId getFrontBlock();
         BlockId getBackBlock();
-        
         void addFaceMeshIfNeeded();
 
     };

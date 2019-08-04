@@ -13,9 +13,6 @@
 #include "Chunk.hpp"
 #include "WorldMapGenerator.hpp"
 #include "InstanceMeshDrawable.hpp"
-#include "LiquidRender.hpp"
-#include "FloraRender.hpp"
-
 
 
 namespace GLL {
@@ -25,31 +22,29 @@ namespace GLL {
     
     class ChunkManager  {
     public:
-        ChunkManager(ChunkRender* chunkRender, LiquidRender* liquidRender, FloraRender* floraRender);
+        ChunkManager(ChunkRender* chunkRender, ChunkRender* liquidRender, ChunkRender* floraRender);
         ~ChunkManager();
-        
-        bool loadChunksIfNeeded(int x, int z);
+        void loadChunksIfNeeded(int x, int z);
         void unloadChunksIfNeeded(const glm::vec3& cameraPosition);
-        void loadChunk(int x, int z);
+        bool loadChunk(int x, int z);
         void unloadChunk(int x, int z);
-        
         WorldMapGenerator& getWorldGenerator();
         std::shared_ptr<Chunk> getChunk(int x, int z);
         std::vector<std::shared_ptr<ChunkBlock>> getBlocks();
-        
     private:
         // locks & containers
         pthread_mutex_t blocksLock;
         pthread_mutex_t chunkMapLock;
-        pthread_mutex_t instanceMeshLock;
+        pthread_mutex_t instanceLock;
+        
         std::unordered_map<VectorXZ, std::shared_ptr<Chunk>> chunkMap;
         std::vector<std::shared_ptr<ChunkBlock>> blocks;
+        std::map<std::string, std::shared_ptr<InstanceMeshDrawable>> instanceMeshDrawables;
         
         // renders
         ChunkRender* chunkRender;
-        LiquidRender* liquidRender;
-        FloraRender* floraRender;
-        
+        ChunkRender* liquidRender;
+        ChunkRender* floraRender;
         // others
         WorldMapGenerator worldGenerator;
         
@@ -57,6 +52,7 @@ namespace GLL {
         bool chunkExistAt(int x, int z);
         bool chunkHasLoadedAt(int x, int z);
         std::string keyStringForMesh(InstanceMesh mesh);
+        void intenalLoadChunk(int x, int z);
     };
 }
 

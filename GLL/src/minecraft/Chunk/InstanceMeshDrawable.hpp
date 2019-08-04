@@ -6,6 +6,10 @@
 
 #include <stdio.h>
 #include <vector>
+#include <atomic>
+#include <mutex>
+#include <thread>
+
 #include "Camera.hpp"
 #include "FrameBuffer.hpp"
 #include "BlockData.hpp"
@@ -20,21 +24,23 @@ namespace GLL {
         ~InstanceMeshDrawable();
         void addOffset(const glm::vec3& offset);
         void instanceDraw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer);
-        GLuint getOffsetsSize() const;
+        GLuint getOffsetsSize();
         BlockDataContent getBlockData() const;
-        
     private:
-        bool dataBuffered = false;
+        std::atomic<bool> dataBuffered;
+        std::atomic<long> currentBuffredOffsetsCount;
+        std::mutex offsetsMutex;
         GLuint VAO, VBO, EBO = 0;
         GLuint instanceVBO = 0;
         std::vector<glm::vec3> offsets;
-        void bufferData();
-        
         BlockDataContent blockData;
         ChunkMesh::ChunkMeshFaceDirection direction;
         std::vector<ChunkMesh::ChunkMeshVertex> vertices;
-
+        
+    private:
         void makeVertices(const std::vector<glm::vec3>& face, const std::vector<glm::vec2>& texCoords, const GLfloat& cardinalLight);
+        void bufferData();
+        void bufferInstanceSubData();
     };
 }
 

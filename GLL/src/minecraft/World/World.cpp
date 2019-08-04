@@ -2,41 +2,20 @@
 #include "World.hpp"
 #include "RandomSingleton.hpp"
 #include <semaphore.h>
-
-
+#include "Camera.hpp"
 
 using namespace GLL;
-
-namespace  {
-    constexpr GLuint WORKER_COUNT = 3;
-}
 
 World::World() :
 masterRender(MasterRender(this)),
 chunkManager(ChunkManager( &masterRender.chunkRender , &masterRender.liquidRender, &masterRender.floraRender )),
-fpsCounter(FPSCounter())
-{
-    setupWokers();
-}
+fpsCounter(FPSCounter()){}
 
 World::~World() {
-    this -> workers.clear();
-}
-
-void World::setupWokers() {
-    for (int i = 0; i < WORKER_COUNT; i ++) {
-        this -> workers.push_back(std::make_shared<Worker>());
-    }
 }
 
 void World::draw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer) {
-    int inflightIndex = inflightCount % WORKER_COUNT;
-    std::shared_ptr<Worker> inflightWorker = this -> workers[inflightIndex];
-    inflightWorker -> enqueue([this, camera, frameBuffer]() {
-        chunkManager.loadChunksIfNeeded(camera -> getCameraPosition().x, camera -> getCameraPosition().z);
-    });
     masterRender.draw(camera, frameBuffer);
-    inflightCount = inflightIndex + 1;
     fpsCounter.update();
 }
 
@@ -50,4 +29,16 @@ ChunkManager& World::getChunkManager() {
 
 void World::setCamera(Camera* camera) {
     this -> camera = camera;
+    this -> camera -> cameraDidUpdated = [&]()->void {
+        this -> cameraDidUpdatedHandle();
+    };
+}
+
+void World::cameraDidUpdatedHandle() {
+    int inflightIndex = inflightCount % WORKER_COUNT;
+    std::shared_ptr<Worker> inflightWorker = WorkersManager::sharedInstance()-> getbackgroundWorkers()[inflightIndex];
+    inflightWorker -> enqueue([&]() {
+        chunkManager.loadChunksIfNeeded(this -> camera->getCameraPosition().x, this -> camera->getCameraPosition().z);
+    });
+    inflightCount = inflightIndex + 1;
 }

@@ -148,6 +148,11 @@ void Camera::update() {
                                                                  this -> nearClippingDistance,
                                                                  this -> farClippingDistance);
     this -> frustum.update(projectionMatrix * viewMatrix);
+    
+    
+    if (this -> cameraDidUpdated) {
+        this -> cameraDidUpdated();
+    }
 }
 
 const ViewFrustum& Camera::getFrustum() const noexcept {

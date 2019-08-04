@@ -18,7 +18,6 @@ namespace GLL {
             thread = new std::thread([this](){
                 for(;;) {
                     std::function<void()> task;
-                    
                     {
                         std::unique_lock<std::mutex> lock(this->queueMutex);
                         this->condition.wait(lock, [this]{ return this->stop || !this->tasks.empty(); });
@@ -32,6 +31,7 @@ namespace GLL {
                 }
             });
         }
+        
         
         template <class F, class ... Args>
         auto enqueue(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type> {

@@ -1,5 +1,7 @@
 
 #include "Window.hpp"
+#include "WorkersManager.hpp"
+
 
 float lastX = WINDOW_WIDTH / 2.0f;
 float lastY = WINDOW_HEIGHT / 2.0f;
@@ -38,7 +40,7 @@ void Window::setup() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
     GLFWwindow *window = nullptr;
-    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenGL", NULL, NULL);
+    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Harvey's Minecraft", NULL, NULL);
     
     if (!window) {
         glfwTerminate();
@@ -56,6 +58,7 @@ void Window::setup() {
     if (this -> framebufferSizeChangedCallback) {
         this -> framebufferSizeChangedCallback(width, height);
     }
+    
     
     this -> glfwWindow = window;
     // 屏幕大小切换
@@ -87,6 +90,7 @@ void Window::runloop() {
     
     while (!glfwWindowShouldClose(this->glfwWindow)) {
         
+        
         TextureParameterOptions options = FrameBuffer::getDefaultTextureOptions();
         std::shared_ptr<FrameBuffer> inFlightFrameBuffer = FrameBufferCache::sharedInstance() -> fetchFrameBuffer(currentFrameBufferSize, options);
         
@@ -103,9 +107,11 @@ void Window::runloop() {
         if (this->displayRunloopCallback) {
             this->displayRunloopCallback(inFlightFrameBuffer);
         }
+        
         glfwSwapBuffers(this->glfwWindow);
         glfwPollEvents();
         inFlightFrameBuffer  -> unlock();
+        
     }
     glfwTerminate();
 }

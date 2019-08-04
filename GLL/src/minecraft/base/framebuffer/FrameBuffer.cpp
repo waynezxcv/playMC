@@ -40,6 +40,7 @@ void FrameBuffer::setup() {
     
     glGenFramebuffers(1, &frameBufferHandle);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBufferHandle);
+
     
     // texture
     glGenTextures(1, &textureHandle);

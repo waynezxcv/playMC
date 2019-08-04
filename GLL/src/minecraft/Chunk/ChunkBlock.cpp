@@ -386,9 +386,11 @@ BlockId ChunkBlock::getBackBlock() {
     return block -> getBlockData().blockId;
 }
 
+
 std::vector<InstanceMesh>& ChunkBlock::getInstanceMeshes() {
     if (hasMadeInstanceMeshes == false) {
         this -> makeInstanceMeshes();
     }
     return instanceMeshes;
 }
+

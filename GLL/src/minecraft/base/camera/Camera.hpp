@@ -64,7 +64,6 @@ namespace GLL {
         const glm::vec3& getCameraFoward() const noexcept;
         const ViewFrustum& getFrustum() const noexcept;
         
-        
         Camera(const CameraConfig& config = Camera::defaultCameraConfig());
         ~Camera();
         
@@ -73,6 +72,8 @@ namespace GLL {
         void processMouseMovement(double x, double y);
         void processMouseLeftButtonDragMovement(double x, double y);
         void processFrameBufferSizeChanged(int width, int height);
+        
+        std::function<void()> cameraDidUpdated;
         
     private:
         

@@ -25,7 +25,6 @@ namespace std {
     };
 }
 
-
 namespace std {
     template<>
     struct hash<glm::vec3> {

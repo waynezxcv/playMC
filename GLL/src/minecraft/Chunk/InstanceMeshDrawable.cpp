@@ -6,27 +6,34 @@
 
 using namespace GLL;
 
+namespace  {
+    constexpr GLuint MAX_OFFSETS_DATA_SIZE = 1024 * 1024; // 1MB
+}
+
 InstanceMeshDrawable::InstanceMeshDrawable(const BlockDataContent& blockData ,const ChunkMesh::ChunkMeshFaceDirection& direction) :
 blockData(blockData),
 direction(direction)
 {
+    currentBuffredOffsetsCount = 0;
 }
 
-
 InstanceMeshDrawable::~InstanceMeshDrawable() {
-    if (instanceVBO != 0) {
-        glDeleteBuffers(1, &instanceVBO);
-    }
     if (VAO != 0) {
         glDeleteVertexArrays(1, &VAO);
     }
-    
     if (VBO != 0) {
-        glDeleteVertexArrays(1, &VBO);
+        glDeleteBuffers(1, &VBO);
+    }
+    if (EBO != 0) {
+        glDeleteBuffers(1, &EBO);
+    }
+    if (instanceVBO != 0) {
+        glDeleteBuffers(1, &instanceVBO);
     }
 }
 
 void InstanceMeshDrawable::bufferData() {
+    
     switch (direction) {
         case ChunkMesh::ChunkMeshFaceDirection_PositiveY: // top
         {
@@ -85,6 +92,7 @@ void InstanceMeshDrawable::bufferData() {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
+    glGenBuffers(1, &instanceVBO);
     
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -105,10 +113,13 @@ void InstanceMeshDrawable::bufferData() {
     glEnableVertexAttribArray(3);
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 9, (void *) (sizeof(GLfloat) * 6));
     
-    
-    glGenBuffers(1, &instanceVBO);
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * offsets.size(), offsets.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * MAX_OFFSETS_DATA_SIZE, NULL, GL_STATIC_DRAW);
+    
+    if (currentBuffredOffsetsCount != this -> getOffsetsSize()) {
+        this -> bufferInstanceSubData();
+    }
+    
     glEnableVertexAttribArray(4);
     glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void *) (0));
     glVertexAttribDivisor(4, 1);
@@ -116,6 +127,17 @@ void InstanceMeshDrawable::bufferData() {
     glBindVertexArray(0);
 }
 
+void InstanceMeshDrawable::bufferInstanceSubData() {
+    if (instanceVBO == 0) {
+        return;
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    this -> offsetsMutex.lock();
+    glBufferSubData(GL_ARRAY_BUFFER, currentBuffredOffsetsCount * sizeof(glm::vec3), (offsets.size() - currentBuffredOffsetsCount) * sizeof(glm::vec3), &offsets[currentBuffredOffsetsCount]);
+    currentBuffredOffsetsCount = offsets.size();
+    this -> offsetsMutex.unlock();
+    
+}
 
 void InstanceMeshDrawable::makeVertices(const std::vector<glm::vec3>& face, const std::vector<glm::vec2>& texCoords, const GLfloat& cardinalLight) {
     for (int i = 0; i <  4; i ++) {
@@ -134,33 +156,42 @@ void InstanceMeshDrawable::instanceDraw(Camera *camera, std::shared_ptr<FrameBuf
         bufferData();
         dataBuffered = true;
     }
-
+    
+    if (currentBuffredOffsetsCount != this -> getOffsetsSize()) {
+        this -> bufferInstanceSubData();
+    }
+    
     TextureAtlas::sharedInstance().bindTexture();
 #if POLYGON_LINE_ENAGLED
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
-    
     glBindVertexArray(VAO);
-    glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0, (int) this -> offsets.size());
+    glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0, (int)this->getOffsetsSize());
     glBindVertexArray(0);
-    
 #if POLYGON_LINE_ENAGLED
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #endif
     TextureAtlas::sharedInstance().unbindTexture();
 }
 
-
 void InstanceMeshDrawable::addOffset(const glm::vec3& offset) {
+    this -> offsetsMutex.lock();
     offsets.push_back(offset);
+    if (offsets.size() > MAX_OFFSETS_DATA_SIZE) {
+        throw std::runtime_error("the offsets is overflow");
+    }
+    this -> offsetsMutex.unlock();
 }
 
 
-GLuint InstanceMeshDrawable::getOffsetsSize() const {
-    return (GLuint)offsets.size();
+GLuint InstanceMeshDrawable::getOffsetsSize() {
+    this -> offsetsMutex.lock();
+    GLuint size = (GLuint)offsets.size();
+    this -> offsetsMutex.unlock();
+    return size;
 }
-
 
 BlockDataContent InstanceMeshDrawable::getBlockData() const {
     return this -> blockData;
 }
+

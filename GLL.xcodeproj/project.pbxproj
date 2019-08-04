@@ -43,8 +43,6 @@
 		015B3E1D22DA31470091CBBB /* CubeTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 015B3E1B22DA31470091CBBB /* CubeTexture.cpp */; };
 		0174725022D0F306009F5D49 /* Window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0174724F22D0F306009F5D49 /* Window.cpp */; };
 		0174725422D0F533009F5D49 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0174725322D0F533009F5D49 /* Camera.cpp */; };
-		017E803522EDE68E00D025CD /* LiquidRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 017E803422EDE68E00D025CD /* LiquidRender.cpp */; };
-		017E803822EDE69A00D025CD /* FloraRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 017E803622EDE69A00D025CD /* FloraRender.cpp */; };
 		018D014922DA24AA00AB9B60 /* Cube.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 018D014722DA24AA00AB9B60 /* Cube.cpp */; };
 		019A8B9022E0E9820073D2E8 /* PerlinNoise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 019A8B8E22E0E9820073D2E8 /* PerlinNoise.cpp */; };
 		019DAB2822DA3DED000CD15E /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 019DAB2622DA3DED000CD15E /* World.cpp */; };
@@ -62,6 +60,7 @@
 		01B5D62C22E4A9B10010F88D /* StructureBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01B5D62A22E4A9B10010F88D /* StructureBuilder.cpp */; };
 		01CA401C22E47E8A002BB400 /* TextRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01CA401B22E47E8A002BB400 /* TextRender.cpp */; };
 		01CA401F22E47ED5002BB400 /* text.vert in Sources */ = {isa = PBXBuildFile; fileRef = 01CA401D22E47ED5002BB400 /* text.vert */; };
+		01DD4E4122F66E1A000DC5CF /* WorkersManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01DD4E3F22F66E1A000DC5CF /* WorkersManager.cpp */; };
 		01FA33A522C8A2F400C76D08 /* FrameBufferCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01FA33A322C8A2F400C76D08 /* FrameBufferCache.cpp */; };
 		01FA33AA22C91C5400C76D08 /* FramebufferManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01FA33A822C91C5400C76D08 /* FramebufferManager.cpp */; };
 /* End PBXBuildFile section */
@@ -564,10 +563,6 @@
 		015B3E1C22DA31470091CBBB /* CubeTexture.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CubeTexture.hpp; sourceTree = "<group>"; };
 		0174724F22D0F306009F5D49 /* Window.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Window.cpp; sourceTree = "<group>"; };
 		0174725322D0F533009F5D49 /* Camera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Camera.cpp; sourceTree = "<group>"; };
-		017E803322EDE68E00D025CD /* LiquidRender.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LiquidRender.hpp; sourceTree = "<group>"; };
-		017E803422EDE68E00D025CD /* LiquidRender.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LiquidRender.cpp; sourceTree = "<group>"; };
-		017E803622EDE69A00D025CD /* FloraRender.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = FloraRender.cpp; path = ../../../../../../../../System/Volumes/Data/Users/liuwei/Desktop/GLL/GLL/src/minecraft/Render/FloraRender.cpp; sourceTree = "<group>"; };
-		017E803722EDE69A00D025CD /* FloraRender.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = FloraRender.hpp; path = ../../../../../../../../System/Volumes/Data/Users/liuwei/Desktop/GLL/GLL/src/minecraft/Render/FloraRender.hpp; sourceTree = "<group>"; };
 		017E803A22EF3F1400D025CD /* Worker.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Worker.hpp; sourceTree = "<group>"; };
 		018D014122D9D76000AB9B60 /* rock.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rock.obj; sourceTree = "<group>"; };
 		018D014222D9D76000AB9B60 /* Rock-Texture-Surface.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "Rock-Texture-Surface.jpg"; sourceTree = "<group>"; };
@@ -629,6 +624,8 @@
 		01D8768822DB2DEE001A97A7 /* chunk.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = chunk.frag; sourceTree = "<group>"; };
 		01D8768C22DBA263001A97A7 /* water.vert */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = water.vert; sourceTree = "<group>"; };
 		01D8768E22DBA3F4001A97A7 /* flora.vert */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = flora.vert; sourceTree = "<group>"; };
+		01DD4E3F22F66E1A000DC5CF /* WorkersManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = WorkersManager.cpp; sourceTree = "<group>"; };
+		01DD4E4022F66E1A000DC5CF /* WorkersManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = WorkersManager.hpp; sourceTree = "<group>"; };
 		01E8587122C77D5C00295E24 /* skybox.vert */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = skybox.vert; sourceTree = "<group>"; };
 		01E8587222C77D6500295E24 /* skybox.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = skybox.frag; sourceTree = "<group>"; };
 		01E8587422C77E6D00295E24 /* Image.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Image.hpp; sourceTree = "<group>"; };
@@ -737,6 +734,8 @@
 		0132A27922DE231000385779 /* World */ = {
 			isa = PBXGroup;
 			children = (
+				01DD4E4022F66E1A000DC5CF /* WorkersManager.hpp */,
+				01DD4E3F22F66E1A000DC5CF /* WorkersManager.cpp */,
 				019DAB2722DA3DED000CD15E /* World.hpp */,
 				019DAB2622DA3DED000CD15E /* World.cpp */,
 			);
@@ -749,6 +748,8 @@
 				019A8B9222E0EAEF0073D2E8 /* ChunkDefine.hpp */,
 				0114913E22E32CCA0043E0F8 /* ChunkManager.hpp */,
 				0114913D22E32CCA0043E0F8 /* ChunkManager.cpp */,
+				0149DAB222E6394D000C3B6C /* InstanceMeshDrawable.hpp */,
+				0149DAB122E6394D000C3B6C /* InstanceMeshDrawable.cpp */,
 				0132A29222E0DECA00385779 /* Chunk.hpp */,
 				0132A29122E0DECA00385779 /* Chunk.cpp */,
 				0132A29522E0DED500385779 /* ChunkSection.hpp */,
@@ -757,8 +758,6 @@
 				0132A29722E0DEDD00385779 /* ChunkBlock.cpp */,
 				0132A29B22E0DF5E00385779 /* ChunkMesh.hpp */,
 				0132A29A22E0DF5E00385779 /* ChunkMesh.cpp */,
-				0149DAB222E6394D000C3B6C /* InstanceMeshDrawable.hpp */,
-				0149DAB122E6394D000C3B6C /* InstanceMeshDrawable.cpp */,
 				01096D5722EC858E00988D18 /* VectorXZ.hpp */,
 				01096D5622EC858E00988D18 /* VectorXZ.cpp */,
 			);
@@ -1468,10 +1467,6 @@
 				01B2C85F22E43EC000FCDAF2 /* SkyboxRender.cpp */,
 				01B2C86322E43EC000FCDAF2 /* ChunkRender.hpp */,
 				01B2C86122E43EC000FCDAF2 /* ChunkRender.cpp */,
-				017E803322EDE68E00D025CD /* LiquidRender.hpp */,
-				017E803422EDE68E00D025CD /* LiquidRender.cpp */,
-				017E803722EDE69A00D025CD /* FloraRender.hpp */,
-				017E803622EDE69A00D025CD /* FloraRender.cpp */,
 				01CA401A22E47E8A002BB400 /* TextRender.hpp */,
 				01CA401B22E47E8A002BB400 /* TextRender.cpp */,
 			);
@@ -1618,7 +1613,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				017E803822EDE69A00D025CD /* FloraRender.cpp in Sources */,
 				012EDBC022D1A36E0060D3EA /* Frustum.cpp in Sources */,
 				0174725422D0F533009F5D49 /* Camera.cpp in Sources */,
 				013DE59B22C1543B00A22DD5 /* Shader.cpp in Sources */,
@@ -1642,7 +1636,6 @@
 				0132A29922E0DEDD00385779 /* ChunkBlock.cpp in Sources */,
 				018D014922DA24AA00AB9B60 /* Cube.cpp in Sources */,
 				0174725022D0F306009F5D49 /* Window.cpp in Sources */,
-				017E803522EDE68E00D025CD /* LiquidRender.cpp in Sources */,
 				01B5D62622E4A7620010F88D /* TemperateForestBiome.cpp in Sources */,
 				010E872C22E4B3F400455494 /* GeneralMaths.cpp in Sources */,
 				0110BE3822C7A8520074472A /* Image.cpp in Sources */,
@@ -1662,6 +1655,7 @@
 				01476C6F22D25F43000DDC15 /* InstanceRender.cpp in Sources */,
 				0149DAB322E6394D000C3B6C /* InstanceMeshDrawable.cpp in Sources */,
 				013BE6BB22C14C1F00695FF8 /* main.cpp in Sources */,
+				01DD4E4122F66E1A000DC5CF /* WorkersManager.cpp in Sources */,
 				0101F76A22F54A60004C5381 /* RandomSingleton.cpp in Sources */,
 				010E872622E4B1D800455494 /* WorldMapGenerator.cpp in Sources */,
 				01CA401F22E47ED5002BB400 /* text.vert in Sources */,

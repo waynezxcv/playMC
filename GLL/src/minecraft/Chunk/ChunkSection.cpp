@@ -143,7 +143,6 @@ void ChunkSection::drawSection(Shader& shader, Camera* camera) {
         return;
     }
 #endif
-    
     if (this -> hasMeshMade == false) {
         this -> makeMeshes();
     }
@@ -158,7 +157,6 @@ void ChunkSection::drawSection(Shader& shader, Camera* camera) {
     }
 #endif
 }
-
 
 bool ChunkSection::isOutOfBounds(const int x, const int y, const int z) {
     if (x < 0 || x >= CHUNK_SIZE) {
@@ -188,4 +186,12 @@ GLuint ChunkSection::getIndexInParentChunk() const {
 
 std::array<std::shared_ptr<ChunkBlock>, CHUNK_VOLUME>& ChunkSection::getBlockArray() {
     return blockArray;
+}
+
+void ChunkSection::lockForReading() {
+    this -> readingMutex.lock();
+}
+
+void ChunkSection::unlockForReading() {
+    this -> readingMutex.unlock();
 }

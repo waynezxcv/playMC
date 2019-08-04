@@ -15,6 +15,7 @@ namespace GLL {
         ~Application();
         void start() ;
         Camera* getCamera() const;
+        
     private:
         T* render;
         Camera *camera;
@@ -26,7 +27,6 @@ namespace GLL {
         void framebufferSizeChangedHandle(int width, int height);
         void displayRunloopHandle(std::shared_ptr<FrameBuffer> frameBuffer);
         CameraMovement cameraMovementFromKeyboardEventType(WindowKeyboardEventType eventType);
-        bool isJumpping = false;
     };
     
     
@@ -122,7 +122,6 @@ namespace GLL {
     void Application<T>::keyboardTapEventHandle(WindowKeyboardEventType eventType, float deltaTime) {
         this -> camera -> processKeyboard(cameraMovementFromKeyboardEventType(eventType), deltaTime);
     }
-    
     
     template <typename T>
     void Application<T>::framebufferSizeChangedHandle(int width, int height) {

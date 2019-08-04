@@ -23,7 +23,6 @@ namespace GLL {
         ~ChunkSection();
         
     public:
-
         std::shared_ptr<ChunkBlock> getBlock(const int x, const int y, const int z);
         static int blockIndexFromPosistionInSection(const int x, const int y, const int z);
         void fillBlocks(const BlockId& blockId);
@@ -33,6 +32,11 @@ namespace GLL {
         std::array<std::shared_ptr<ChunkBlock>, CHUNK_VOLUME>& getBlockArray();
         glm::vec3 getPositionInWorld() const;
         void drawSection(Shader& shader, Camera* camera);
+        
+        
+        void lockForReading();
+        void unlockForReading();
+
 
     private:
         void makeMeshes();
@@ -40,7 +44,6 @@ namespace GLL {
         void deleteMeshBuffers();
         void cleanUp();
         void setupBlocks();
-        
         
         void setBlock(std::shared_ptr<ChunkBlock> block);
         void updateBlock(const BlockId& blockId,const int x, const int y, const int z);
@@ -57,6 +60,7 @@ namespace GLL {
         
         std::mutex blockArrayMutex;
         std::mutex traversingMutex;
+        std::mutex readingMutex;
         
         AABB aabb;
         glm::vec3 positionInWorld;

@@ -6,35 +6,49 @@
 
 using namespace GLL;
 
-ChunkManager::ChunkManager(ChunkRender* chunkRender, LiquidRender* liquidRender, FloraRender* floraRender) :
+ChunkManager::ChunkManager(ChunkRender* chunkRender, ChunkRender* liquidRender, ChunkRender* floraRender) :
 chunkRender(chunkRender),
 liquidRender(liquidRender),
 floraRender(floraRender),
 worldGenerator(WorldMapGenerator()) {
     pthread_mutex_init(&chunkMapLock, NULL);
     pthread_mutex_init(&blocksLock, NULL);
-    pthread_mutex_init(&instanceMeshLock, NULL);
+    pthread_mutex_init(&instanceLock, NULL);
+    
+    
 }
-
 
 ChunkManager::~ChunkManager() {
     chunkMap.clear();
     pthread_mutex_destroy(&chunkMapLock);
     pthread_mutex_destroy(&blocksLock);
-    pthread_mutex_destroy(&instanceMeshLock);
+    pthread_mutex_destroy(&instanceLock);
 }
 
-bool ChunkManager::loadChunksIfNeeded(int x, int z) {
+void ChunkManager::loadChunksIfNeeded(int x, int z) {
+    if (x % CHUNK_SIZE == 0 && z % CHUNK_SIZE == 0) {
+        this -> intenalLoadChunk(x, z);
+    }
+    else if (x % CHUNK_SIZE == 0 && z % CHUNK_SIZE != 0) {
+        int finalZ = z / CHUNK_SIZE;
+        this -> intenalLoadChunk(x, finalZ * CHUNK_SIZE);
+    }
+    else if (x % CHUNK_SIZE != 0 && z % CHUNK_SIZE == 0) {
+        int finalX = x / CHUNK_SIZE;
+        this -> intenalLoadChunk(finalX * CHUNK_SIZE, z);
+    }
+}
+
+void ChunkManager::intenalLoadChunk(int x, int z) {
     for (int nx = -1; nx <= 1; nx ++) {
         for (int nz = -1; nz <= 1; nz ++) {
-            this -> loadChunk(x + nx * CHUNK_SIZE, z + nz * CHUNK_SIZE) ;
+            this -> loadChunk(x + nx * CHUNK_SIZE, z + nz * CHUNK_SIZE);
         }
     }
-    return true;
 }
 
+
 void ChunkManager::unloadChunksIfNeeded(const glm::vec3 &cameraPosition) {
-    // 卸载附近的chunk
     for (int nx = -1; nx <= 1; nx ++) {
         for (int nz = -1; nz <= 1; nz ++) {
             this -> unloadChunk(cameraPosition.x + nx, cameraPosition.y + nz);
@@ -42,39 +56,45 @@ void ChunkManager::unloadChunksIfNeeded(const glm::vec3 &cameraPosition) {
     }
 }
 
-void ChunkManager::loadChunk(int x, int z) {
+bool ChunkManager::loadChunk(int x, int z) {
     
 #if INSTANCE_DRAW_ENABLED
-    // 1.获取xz坐标获取到chunk
-    std::shared_ptr<Chunk> chunk = this -> getChunk(x, z);
-    chunk -> load(worldGenerator);
     
+    // 1.获取xz坐标获取到chunk
+    if (this -> chunkHasLoadedAt(x, z)) {
+        return false;
+    }
+    
+    std::shared_ptr<Chunk> chunk = this -> getChunk(x, z);
+    chunk -> lockForReading();
+    chunk -> load(worldGenerator);
     // 2. 遍历chunk中的sections
     for (int i = 0; i < CHUNK_SIZE; i ++) {
         std::shared_ptr<ChunkSection> section = chunk -> getSection(i);
-        if (section != nullptr) {
-            std::array<std::shared_ptr<ChunkBlock>, CHUNK_VOLUME> blocks = section -> getBlockArray();
-            // 3.遍历section中的blocks
-            for (int j = 0; j < CHUNK_VOLUME; j ++) {
-                std::shared_ptr<ChunkBlock> block = blocks[j];
-                pthread_mutex_lock(&blocksLock);
-                this -> blocks.push_back(block);
-                pthread_mutex_unlock(&blocksLock);
-            }
+        section -> lockForReading();
+        std::array<std::shared_ptr<ChunkBlock>, CHUNK_VOLUME> blocks = section -> getBlockArray();
+        // 3.遍历section中的blocks
+        for (int j = 0; j < CHUNK_VOLUME; j ++) {
+            std::shared_ptr<ChunkBlock> block = blocks[j];
+            pthread_mutex_lock(&blocksLock);
+            this -> blocks.push_back(block);
+            pthread_mutex_unlock(&blocksLock);
         }
+        section -> unlockForReading();
     }
+    chunk -> unlockForReading();
     
-    std::vector<std::shared_ptr<ChunkBlock>> blocks = this -> getBlocks();
+    
     // 4. 遍历block，进行遮挡面剔除，并转换成isntanced渲染
-    std::map<std::string, std::shared_ptr<InstanceMeshDrawable>> instanceMeshes;
+    std::vector<std::shared_ptr<ChunkBlock>> blocks = this -> getBlocks();
     for (std::shared_ptr<ChunkBlock> block : blocks) {
         std::vector<InstanceMesh> meshes = block -> getInstanceMeshes();
         for (InstanceMesh mesh : meshes) {
-            
+            pthread_mutex_lock(&instanceLock);
             std::string key = this -> keyStringForMesh(mesh);
-            pthread_mutex_lock(&instanceMeshLock);
-            auto iterator = instanceMeshes.find(key);
-            bool found = iterator != instanceMeshes.end();
+            auto iterator = this -> instanceMeshDrawables.find(key);
+            bool found = iterator != this -> instanceMeshDrawables.end();
+            pthread_mutex_unlock(&instanceLock);
             if (found) {
                 std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>> pair = *iterator;
                 std::shared_ptr<InstanceMeshDrawable> drawable = pair.second;
@@ -84,31 +104,33 @@ void ChunkManager::loadChunk(int x, int z) {
                 std::shared_ptr<InstanceMeshDrawable> drawable = std::make_shared<InstanceMeshDrawable>(mesh.blockData, mesh.direction);
                 drawable -> addOffset(mesh.offset);
                 std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>> pair(key, drawable);
-                instanceMeshes.insert(pair);
+                pthread_mutex_lock(&instanceLock);
+                this -> instanceMeshDrawables.insert(pair);
+                pthread_mutex_unlock(&instanceLock);
             }
-            pthread_mutex_unlock(&instanceMeshLock);
         }
     }
-
-    //5. 生成instanceMesDrawable对象
-    GLuint count = 0;
-    pthread_mutex_lock(&instanceMeshLock);
-    for (auto it = instanceMeshes.begin(); it != instanceMeshes.end(); it ++) {
+    
+    // 5. 生成instanceMesDrawable对象
+    pthread_mutex_lock(&instanceLock);
+    for (auto it = this -> instanceMeshDrawables.begin(); it !=  this -> instanceMeshDrawables.end(); it ++) {
         std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>> pair = *it;
         std::shared_ptr<InstanceMeshDrawable> drawable = pair.second;
         BlockShaderType shaderType = drawable -> getBlockData().shaderType;
+        
         if (shaderType == BlockShaderType_Chunck) {
-            this->chunkRender -> addDrawable(drawable);
+            chunkRender -> addInstanceDrawablesIfNeeded(pair);
         }
         else if (shaderType == BlockShaderType_Liquid) {
-            this -> liquidRender -> addDrawable(drawable);
+            liquidRender -> addInstanceDrawablesIfNeeded(pair);
         }
         else if (shaderType == BlockShaderType_Flora) {
-            this->floraRender -> addDrawable(drawable);
+            floraRender -> addInstanceDrawablesIfNeeded(pair);
         }
-        count += drawable->getOffsetsSize();
     }
-    pthread_mutex_unlock(&instanceMeshLock);
+    
+    pthread_mutex_unlock(&instanceLock);
+    return true;
 #endif
 }
 

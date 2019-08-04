@@ -14,9 +14,6 @@
 #endif
 
 
-#include "LiquidRender.hpp"
-#include "FloraRender.hpp"
-
 
 namespace GLL {
     class World;
@@ -33,8 +30,8 @@ namespace GLL {
         void draw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer) override;
         
         ChunkRender chunkRender;
-        LiquidRender liquidRender;
-        FloraRender floraRender;
+        ChunkRender liquidRender;
+        ChunkRender floraRender;
 
 #if TEXT_RENDER_ENABLED
         TextRender textRender;

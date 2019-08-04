@@ -7,9 +7,9 @@ using namespace GLL;
 
 MasterRender::MasterRender(World* world) :
 skyboxRender(SkyboxRender()),
-chunkRender(ChunkRender()),
-liquidRender(LiquidRender()),
-floraRender(FloraRender()),
+chunkRender(ChunkRender("chunk.vert")),
+liquidRender(ChunkRender("water.vert")),
+floraRender(ChunkRender("flora.vert")),
 #if TEXT_RENDER_ENABLED
 textRender(TextRender()),
 #endif

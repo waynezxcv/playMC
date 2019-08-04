@@ -23,13 +23,12 @@ void Chunk::cleanUp() {
     this -> sectionMap.clear();
 }
 
-
 #pragma mark -
 
 void Chunk::setBlock(const BlockId& blockId, const GLfloat& x,  const GLfloat& y, const GLfloat& z) {
-    
     std::lock_guard<std::mutex> lock(updateBlockMutex);
     GLuint sectionIndex = y / CHUNK_SIZE - 1;
+    
     std::shared_ptr<ChunkSection> section = this -> getSection(sectionIndex);
     int bY = (int)y % (int)CHUNK_SIZE;
     if (section != nullptr) {
@@ -53,26 +52,22 @@ void Chunk::setBlock(const BlockId& blockId, const GLfloat& x,  const GLfloat& y
 std::shared_ptr<ChunkSection> Chunk::getSection(const int index) {
     
     std::lock_guard<std::mutex> lock(this -> sectionMapMutex);
-    
     if (isOutOfBouds(index)) {
         return nullptr;
     }
     
-    if (this -> sectionMap.size() < index) {
-        return nullptr;
-    }
     bool found = sectionMap.find(index) != sectionMap.end();
-    
     if (found) {
         return sectionMap[index];
     }
     
     std::shared_ptr<ChunkSection> section = std::make_shared<ChunkSection>(this -> getLocation(),index);
     section -> setParentChunk(this);
-    this -> sectionMap[index] = section;
-    
+    std::pair<int, std::shared_ptr<ChunkSection>> pair(index, section);
+    this -> sectionMap.insert(pair);
     return section;
 }
+
 
 #pragma mark -
 
@@ -132,7 +127,6 @@ void Chunk::drawChunk(Shader& shader, Camera* camera) {
         sectionMapMutex.lock();
         std::shared_ptr<ChunkSection> section = this -> sectionArray[i];
         sectionMapMutex.unlock();
-        
         section -> drawSection(shader, camera);
     }
 #endif
@@ -155,31 +149,29 @@ void Chunk::setLocation(const glm::vec2& location) {
 
 
 bool Chunk::getHasLoaded() {
-    
-    buildingMutex.lock();
+    std::lock_guard<std::mutex> lock(this -> loadedMutex);
     bool hasLoaded = this -> hasLoaded;
-    buildingMutex.unlock();
-    
     return hasLoaded;
 }
 
 void Chunk::load(WorldMapGenerator& generator) {
-    
-    this -> buildingMutex.lock();
-    
+    std::lock_guard<std::mutex> lock(this -> loadedMutex);
     if (hasLoaded == true) {
-        this -> buildingMutex.unlock();
         return;
     }
-    
-    std::cout<<">>load the chunk at ( x:"<<this -> getLocation().x<<" | z:"<<this -> getLocation().y<<")"<<" ..."<<std::endl;
-    
     generator.generateTerrainFor(*this);
     this -> hasLoaded = true;
-    this -> buildingMutex.unlock();
 }
-
 
 int Chunk::getHeightAt(int x, int z) {
     return highestBlocks.get(x, z);
+}
+
+void Chunk::lockForReading() {
+    this -> readingMutex.lock();
+}
+
+
+void Chunk::unlockForReading() {
+    this -> readingMutex.unlock();
 }
