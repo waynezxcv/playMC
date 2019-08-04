@@ -7,7 +7,7 @@
 using namespace GLL;
 
 namespace  {
-    constexpr GLuint MAX_OFFSETS_DATA_SIZE = 1024 * 1024; // 1MB
+    constexpr GLuint MAX_OFFSETS_DATA_SIZE = 1024 * 1024 * 5; // 5MB
 }
 
 InstanceMeshDrawable::InstanceMeshDrawable(const BlockDataContent& blockData ,const ChunkMesh::ChunkMeshFaceDirection& direction) :
@@ -33,57 +33,47 @@ InstanceMeshDrawable::~InstanceMeshDrawable() {
 }
 
 void InstanceMeshDrawable::bufferData() {
-    
     switch (direction) {
-        case ChunkMesh::ChunkMeshFaceDirection_PositiveY: // top
-        {
+        case ChunkMesh::ChunkMeshFaceDirection_PositiveY: {
             makeVertices(topFace,TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.topTextureCoords), LIGHT_TOP);
         }
             break;
             
-        case ChunkMesh::ChunkMeshFaceDirection_NegativeY: // bottom
-        {
+        case ChunkMesh::ChunkMeshFaceDirection_NegativeY: {
             makeVertices(bottomFace, TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.bottomTextureCoords), LIGHT_BOT);
         }
             
             break;
             
-        case ChunkMesh::ChunkMeshFaceDirection_NegativeX: //left
-        {
+        case ChunkMesh::ChunkMeshFaceDirection_NegativeX: {
             makeVertices(leftFace, TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.sideTextrueCoords), LIGHT_X);
         }
             
             break;
             
-        case ChunkMesh::ChunkMeshFaceDirection_PositiveX: //right
-        {
+        case ChunkMesh::ChunkMeshFaceDirection_PositiveX: {
             makeVertices(rightFace,TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.sideTextrueCoords), LIGHT_X);
             
         }
             break;
             
-        case ChunkMesh::ChunkMeshFaceDirection_PositiveZ: // front
-        {
+        case ChunkMesh::ChunkMeshFaceDirection_PositiveZ: {
             makeVertices(frontFace, TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.sideTextrueCoords), LIGHT_Z);
         }
             break;
             
-        case ChunkMesh::ChunkMeshFaceDirection_NegativeZ: //back
-        {
+        case ChunkMesh::ChunkMeshFaceDirection_NegativeZ: {
             makeVertices(backFace, TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.sideTextrueCoords), LIGHT_Z);
         }
             
             break;
             
-            
-        case ChunkMesh::ChunkMeshFaceDirection_XZ: // xface1
-        {
+        case ChunkMesh::ChunkMeshFaceDirection_XZ: {
             makeVertices(xFace1, TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.topTextureCoords), LIGHT_X);
         }
             break;
             
-        case ChunkMesh::ChunkMeshFaceDirection_ZX: // xface2
-        {
+        case ChunkMesh::ChunkMeshFaceDirection_ZX: {
             makeVertices(xFace2, TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.topTextureCoords), LIGHT_X);
         }
             break;
@@ -116,14 +106,16 @@ void InstanceMeshDrawable::bufferData() {
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * MAX_OFFSETS_DATA_SIZE, NULL, GL_STATIC_DRAW);
     
-    if (currentBuffredOffsetsCount != this -> getOffsetsSize()) {
+    this -> offsetsMutex.lock();
+    GLint offsetsSzie = (GLint)offsets.size();
+    this -> offsetsMutex.unlock();
+    
+    if (currentBuffredOffsetsCount != offsetsSzie) {
         this -> bufferInstanceSubData();
     }
-    
     glEnableVertexAttribArray(4);
     glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void *) (0));
     glVertexAttribDivisor(4, 1);
-    
     glBindVertexArray(0);
 }
 
@@ -136,7 +128,6 @@ void InstanceMeshDrawable::bufferInstanceSubData() {
     glBufferSubData(GL_ARRAY_BUFFER, currentBuffredOffsetsCount * sizeof(glm::vec3), (offsets.size() - currentBuffredOffsetsCount) * sizeof(glm::vec3), &offsets[currentBuffredOffsetsCount]);
     currentBuffredOffsetsCount = offsets.size();
     this -> offsetsMutex.unlock();
-    
 }
 
 void InstanceMeshDrawable::makeVertices(const std::vector<glm::vec3>& face, const std::vector<glm::vec2>& texCoords, const GLfloat& cardinalLight) {
@@ -151,13 +142,16 @@ void InstanceMeshDrawable::makeVertices(const std::vector<glm::vec3>& face, cons
 }
 
 void InstanceMeshDrawable::instanceDraw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer) {
-    
     if (dataBuffered == false) {
         bufferData();
         dataBuffered = true;
     }
     
-    if (currentBuffredOffsetsCount != this -> getOffsetsSize()) {
+    this -> offsetsMutex.lock();
+    GLint offsetsSzie = (GLint)offsets.size();
+    this -> offsetsMutex.unlock();
+    
+    if (currentBuffredOffsetsCount != offsetsSzie) {
         this -> bufferInstanceSubData();
     }
     
@@ -166,7 +160,7 @@ void InstanceMeshDrawable::instanceDraw(Camera *camera, std::shared_ptr<FrameBuf
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
     glBindVertexArray(VAO);
-    glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0, (int)this->getOffsetsSize());
+    glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0, (int)offsetsSzie);
     glBindVertexArray(0);
 #if POLYGON_LINE_ENAGLED
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -178,17 +172,9 @@ void InstanceMeshDrawable::addOffset(const glm::vec3& offset) {
     this -> offsetsMutex.lock();
     offsets.push_back(offset);
     if (offsets.size() > MAX_OFFSETS_DATA_SIZE) {
-        throw std::runtime_error("the offsets is overflow");
+        std::cout<<"[ERROR] the offsets is heap over flow ... "<<std::endl;
     }
     this -> offsetsMutex.unlock();
-}
-
-
-GLuint InstanceMeshDrawable::getOffsetsSize() {
-    this -> offsetsMutex.lock();
-    GLuint size = (GLuint)offsets.size();
-    this -> offsetsMutex.unlock();
-    return size;
 }
 
 BlockDataContent InstanceMeshDrawable::getBlockData() const {

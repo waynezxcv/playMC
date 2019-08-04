@@ -1,10 +1,4 @@
-//
-//  FPSCounter.hpp
-//  GLL
-//
-//  Created by 刘微 on 2019/8/3.
-//  Copyright © 2019 liu.wei. All rights reserved.
-//
+
 
 #ifndef FPSCounter_hpp
 #define FPSCounter_hpp

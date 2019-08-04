@@ -14,16 +14,16 @@ namespace {
     const int seed = RandomSingleton::sharedInstance().intInRange(424, 325322);
 }
 
-PerlinNoise WorldMapGenerator::m_biomeNoiseGen(seed * 2);
+PerlinNoise WorldMapGenerator::biomeNoiseGen(seed * 2);
 
 
 
 WorldMapGenerator::WorldMapGenerator() :
-m_grassBiome (seed),
-m_temperateForest (seed),
-m_desertBiome (seed),
-m_oceanBiome (seed),
-m_lightForest (seed) {
+grassBiome (seed),
+temperateForest (seed),
+desertBiome (seed),
+oceanBiome (seed),
+lightForest (seed) {
     setUpNoise();
 }
 
@@ -40,13 +40,13 @@ void WorldMapGenerator::setUpNoise() {
         biomeParmams.smoothness = 1035;
         biomeParmams.heightOffset = 0;
         biomeParmams.roughness = 0.75;
-        m_biomeNoiseGen.setParameters(biomeParmams);
+        biomeNoiseGen.setParameters(biomeParmams);
     }
 }
 
 void WorldMapGenerator::generateTerrainFor(Chunk& chunk) {
     
-    m_pChunk = &chunk;
+    this -> chunk = &chunk;
     auto location = chunk.getLocation();
     m_random.setSeed(((int)location.x ^ (int)location.y) << 2);
     
@@ -67,7 +67,7 @@ void WorldMapGenerator::getHeightIn (int xMin, int zMin, int xMax, int zMax) {
     
     auto getHeightAt = [&](int x, int z) {
         const Biome& biome = getBiome(x, z);
-        return biome.getHeight(x, z, m_pChunk->getLocation().x, m_pChunk->getLocation().y);
+        return biome.getHeight(x, z, chunk->getLocation().x, chunk->getLocation().y);
     };
     
     int bottomLeft = getHeightAt(xMin, zMin);
@@ -104,10 +104,10 @@ void WorldMapGenerator::getHeightMap() {
 
 
 void WorldMapGenerator::getBiomeMap() {
-    auto location = m_pChunk->getLocation();
+    auto location = chunk->getLocation();
     for (int x = 0; x < CHUNK_SIZE + 1; x++) {
         for (int z = 0; z < CHUNK_SIZE + 1; z++) {
-            int h = m_biomeNoiseGen.getHeight(x, z, location.x + 10, location.y + 10);
+            int h = biomeNoiseGen.getHeight(x, z, location.x + 10, location.y + 10);
             m_biomeMap.get(x, z) = h;
         }
     }
@@ -127,15 +127,15 @@ void WorldMapGenerator::setBlocks(int maxHeight) {
                 
                 if (y > height) {
                     if (y <= WATER_LEVEL) {
-                        m_pChunk->setBlock(BlockId_Water, x, y, z);
+                        chunk->setBlock(BlockId_Water, x, y, z);
                     }
                     continue;
                 }
                 else if (y == height) {
                     if (y >= WATER_LEVEL) {
                         if (y < WATER_LEVEL + 4) {
-                            BlockId blockId = biome.getBeachBlock(m_random).getBlockData().blockId;
-                            m_pChunk->setBlock(blockId, x, y, z);
+                            BlockId blockId = biome.getBeachBlock(m_random);
+                            chunk->setBlock(blockId, x, y, z);
                             continue;
                         }
                         if (m_random.intInRange(0, biome.getTreeFrequency()) == 5 ) {
@@ -144,19 +144,19 @@ void WorldMapGenerator::setBlocks(int maxHeight) {
                         if (m_random.intInRange(0, biome.getPlantFrequency()) == 5 ) {
                             plants.emplace_back(x, y + 1, z);
                         }
-                        BlockId blockId = biome.getTopBlock(m_random).getBlockData().blockId;
-                        m_pChunk->setBlock( blockId, x, y, z);
+                        BlockId blockId = biome.getTopBlock(m_random);
+                        chunk->setBlock( blockId, x, y, z);
                     }
                     else {
-                        BlockId blockId = biome.getUnderWaterBlock(m_random).getBlockData().blockId;
-                        m_pChunk->setBlock(blockId, x, y, z );
+                        BlockId blockId = biome.getUnderWaterBlock(m_random);
+                        chunk->setBlock(blockId, x, y, z );
                     }
                 }
                 else if (y > height - 3) {
-                    m_pChunk->setBlock(BlockId_Dirt, x, y, z);
+                    chunk->setBlock(BlockId_Dirt, x, y, z);
                 }
                 else {
-                    m_pChunk->setBlock(BlockId_Stone ,x, y, z);
+                    chunk->setBlock(BlockId_Stone ,x, y, z);
                 }
             }
         }
@@ -167,14 +167,14 @@ void WorldMapGenerator::setBlocks(int maxHeight) {
         int x = plant.x;
         int z = plant.z;
         
-        auto blockId = getBiome(x, z).getPlant(m_random).getBlockData().blockId;
-        m_pChunk->setBlock(blockId, x, plant.y, z);
+        auto blockId = getBiome(x, z).getPlant(m_random);
+        chunk->setBlock(blockId, x, plant.y, z);
     }
     
     for (auto& tree : trees) {
         int x = tree.x;
         int z = tree.z;
-        getBiome(x, z).makeTree(m_random, *m_pChunk, x, tree.y, z);
+        getBiome(x, z).makeTree(m_random, *chunk, x, tree.y, z);
     }
 }
 
@@ -184,25 +184,25 @@ const Biome& WorldMapGenerator::getBiome(int x, int z) const {
     int biomeValue = m_biomeMap.get(x, z);
     
     if (biomeValue > 160) {
-        return m_oceanBiome;
+        return oceanBiome;
     }
     else if (biomeValue > 150) {
-        return m_grassBiome;
+        return grassBiome;
     }
     else if (biomeValue > 130) {
-        return m_lightForest;
+        return lightForest;
     }
     else if (biomeValue > 120) {
-        return m_temperateForest;
+        return temperateForest;
     }
     else if (biomeValue > 110) {
-        return m_lightForest;
+        return lightForest;
     }
     else if (biomeValue > 100) {
-        return m_grassBiome;
+        return grassBiome;
     }
     else {
-        return m_desertBiome;
+        return desertBiome;
     }
     
 }

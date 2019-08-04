@@ -29,7 +29,7 @@ float smoothInterpolation(float bottomLeft,
     float zValue = 1 - (z-zMin)/height;
     float a = smoothstep(bottomLeft,bottomRight,xValue);
     float b = smoothstep(topLeft,topRight,xValue);
-    return  smoothstep(a,b,zValue);
+    return smoothstep(a,b,zValue);
 }
 
 float bilinearInterpolation(float bottomLeft, float topLeft, float bottomRight, float topRight,

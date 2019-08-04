@@ -6,11 +6,10 @@ using namespace GLL;
 
 
 void StructureBuilder::build(Chunk& chunk) {
-    for (auto& block : m_blocks) {
+    for (auto& block : blocks) {
         chunk.setBlock(block.id, block.x, block.y, block.z);
     }
 }
-
 
 void StructureBuilder::makeColumn(int x, int z, int yStart, int height, BlockId block) {
     for (int y = yStart; y < yStart + height; y++) {
@@ -38,7 +37,7 @@ void StructureBuilder::fill(int y, int xStart, int xEnd, int zStart, int zEnd, B
 }
 
 void StructureBuilder::addBlock(int x, int y, int z, BlockId block) {
-    m_blocks.emplace_back(block, x, y, z);
+    blocks.emplace_back(block, x, y, z);
 }
 
 

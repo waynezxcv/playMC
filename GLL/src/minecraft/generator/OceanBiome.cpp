@@ -9,12 +9,12 @@ using namespace GLL;
 OceanBiome::OceanBiome(int seed) :
 Biome(getNoiseParameters(), 50, 100, seed) {}
 
-ChunkBlock OceanBiome::getTopBlock(Rand& rand) const {
+BlockId OceanBiome::getTopBlock(Rand& rand) const {
     return BlockId_Grass;
 }
 
 
-ChunkBlock OceanBiome::getUnderWaterBlock(Rand& rand) const {
+BlockId OceanBiome::getUnderWaterBlock(Rand& rand) const {
     return BlockId_Sand;
 }
 
@@ -37,7 +37,7 @@ NoiseParameters OceanBiome::getNoiseParameters() {
 }
 
 
-ChunkBlock OceanBiome::getPlant(Rand& rand) const {
+BlockId OceanBiome::getPlant(Rand& rand) const {
     return rand.intInRange(0, 10) > 6 ? BlockId_Rose : BlockId_TallGrass;
 }
 

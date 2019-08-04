@@ -14,9 +14,8 @@ worldGenerator(WorldMapGenerator()) {
     pthread_mutex_init(&chunkMapLock, NULL);
     pthread_mutex_init(&blocksLock, NULL);
     pthread_mutex_init(&instanceLock, NULL);
-    
-    
 }
+
 
 ChunkManager::~ChunkManager() {
     chunkMap.clear();
@@ -47,7 +46,6 @@ void ChunkManager::intenalLoadChunk(int x, int z) {
     }
 }
 
-
 void ChunkManager::unloadChunksIfNeeded(const glm::vec3 &cameraPosition) {
     for (int nx = -1; nx <= 1; nx ++) {
         for (int nz = -1; nz <= 1; nz ++) {
@@ -58,31 +56,24 @@ void ChunkManager::unloadChunksIfNeeded(const glm::vec3 &cameraPosition) {
 
 bool ChunkManager::loadChunk(int x, int z) {
     
-#if INSTANCE_DRAW_ENABLED
-    
     // 1.获取xz坐标获取到chunk
-    if (this -> chunkHasLoadedAt(x, z)) {
+    if (this -> chunkExistAt(x, z) || this -> chunkHasLoadedAt(x, z)) {
         return false;
     }
+    std::cout<<">> start load chunk at : [ "<<x<<" , "<<z<<" ]"<<std::endl;
     
+    // 2.生成地图
     std::shared_ptr<Chunk> chunk = this -> getChunk(x, z);
-    chunk -> lockForReading();
     chunk -> load(worldGenerator);
-    // 2. 遍历chunk中的sections
-    for (int i = 0; i < CHUNK_SIZE; i ++) {
-        std::shared_ptr<ChunkSection> section = chunk -> getSection(i);
-        section -> lockForReading();
-        std::array<std::shared_ptr<ChunkBlock>, CHUNK_VOLUME> blocks = section -> getBlockArray();
-        // 3.遍历section中的blocks
-        for (int j = 0; j < CHUNK_VOLUME; j ++) {
-            std::shared_ptr<ChunkBlock> block = blocks[j];
+    
+    // 3. 遍历chunk中的sections
+    chunk->traversingSections([&](std::shared_ptr<ChunkSection> section) -> void {
+        section -> travesingBlocks([&](std::shared_ptr<ChunkBlock> block) -> void {
             pthread_mutex_lock(&blocksLock);
-            this -> blocks.push_back(block);
+            this -> blocks.emplace_back(std::move(block));
             pthread_mutex_unlock(&blocksLock);
-        }
-        section -> unlockForReading();
-    }
-    chunk -> unlockForReading();
+        });
+    });
     
     
     // 4. 遍历block，进行遮挡面剔除，并转换成isntanced渲染
@@ -117,7 +108,6 @@ bool ChunkManager::loadChunk(int x, int z) {
         std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>> pair = *it;
         std::shared_ptr<InstanceMeshDrawable> drawable = pair.second;
         BlockShaderType shaderType = drawable -> getBlockData().shaderType;
-        
         if (shaderType == BlockShaderType_Chunck) {
             chunkRender -> addInstanceDrawablesIfNeeded(pair);
         }
@@ -128,12 +118,9 @@ bool ChunkManager::loadChunk(int x, int z) {
             floraRender -> addInstanceDrawablesIfNeeded(pair);
         }
     }
-    
     pthread_mutex_unlock(&instanceLock);
     return true;
-#endif
 }
-
 
 void ChunkManager::unloadChunk(int x, int z) {
     if (chunkExistAt(x, z)) {
@@ -165,11 +152,11 @@ bool ChunkManager::chunkExistAt(int x, int z) {
     return existed;
 }
 
-
 std::shared_ptr<Chunk> ChunkManager::getChunk(int x, int z) {
     VectorXZ key {x,z};
     if (this -> chunkExistAt(x, z) == false) {
         std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(x, z);
+        chunk -> setupSections();
         if (chunk != nullptr) {
             pthread_mutex_lock(&chunkMapLock);
             this -> chunkMap.emplace(key, std::move(chunk));
@@ -191,7 +178,6 @@ bool ChunkManager::chunkHasLoadedAt(int x, int z) {
     pthread_mutex_unlock(&chunkMapLock);
     return loaded;
 }
-
 
 WorldMapGenerator& ChunkManager::getWorldGenerator() {
     return worldGenerator;

@@ -38,13 +38,13 @@ namespace GLL {
         Random<std::minstd_rand> m_random;
         
     private:
-        static PerlinNoise m_biomeNoiseGen;
-        GrasslandBiome m_grassBiome;
-        TemperateForestBiome m_temperateForest;
-        DesertBiome m_desertBiome;
-        OceanBiome m_oceanBiome;
-        LightForest m_lightForest;
-        Chunk* m_pChunk = nullptr;
+        static PerlinNoise biomeNoiseGen;
+        GrasslandBiome grassBiome;
+        TemperateForestBiome temperateForest;
+        DesertBiome desertBiome;
+        OceanBiome oceanBiome;
+        LightForest lightForest;
+        Chunk* chunk = nullptr;
     };
     
     

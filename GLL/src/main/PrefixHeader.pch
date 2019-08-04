@@ -16,13 +16,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
-#define INSTANCE_DRAW_ENABLED (1)
 #define CUSTOM_CULL_FACE_ENABLED (1)
 #define GL_CULL_FACE_ENABLED (1)
-
 #define POLYGON_LINE_ENAGLED (0)
 
-#define AABB_TEST_ENABLED (0)
+#define AABB_TEST_ENABLED (1)
 #define TEXT_RENDER_ENABLED (0)
 
 #endif /* PrefixHeader_pch */

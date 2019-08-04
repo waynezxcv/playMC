@@ -8,7 +8,7 @@
 #include "Worker.hpp"
 
 namespace  {
-    constexpr GLuint WORKER_COUNT = 2;
+    constexpr GLuint WORKER_COUNT = 3;
 }
 
 namespace GLL {

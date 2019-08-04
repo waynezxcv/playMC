@@ -9,16 +9,16 @@ GrasslandBiome::GrasslandBiome(int seed) :
 Biome  (getNoiseParameters(), 1000, 20, seed) {
 }
 
-ChunkBlock GrasslandBiome::getTopBlock(Rand& rand) const {
+BlockId GrasslandBiome::getTopBlock(Rand& rand) const {
     return BlockId_Grass;
 }
 
-ChunkBlock GrasslandBiome::getUnderWaterBlock(Rand& rand) const {
+BlockId GrasslandBiome::getUnderWaterBlock(Rand& rand) const {
     return rand.intInRange(0, 10) > 8 ? BlockId_Dirt : BlockId_Sand;
 }
 
 
-ChunkBlock GrasslandBiome::getBeachBlock (Rand& rand) const {
+BlockId GrasslandBiome::getBeachBlock (Rand& rand) const {
     return rand.intInRange(0, 10) > 2 ? BlockId_Grass: BlockId_Dirt;
 }
 
@@ -38,7 +38,7 @@ NoiseParameters GrasslandBiome::getNoiseParameters() {
     return heightParams;
 }
 
-ChunkBlock GrasslandBiome::getPlant(Rand& rand) const {
+BlockId GrasslandBiome::getPlant(Rand& rand) const {
     return rand.intInRange(0, 10) > 6 ? BlockId_Rose : BlockId_TallGrass;
 }
 

@@ -15,6 +15,18 @@ World::~World() {
 }
 
 void World::draw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer) {
+    if (this -> camera == nullptr) {
+        return;
+    }
+    
+    int inflightIndex = inflightCount % WORKER_COUNT;
+    std::shared_ptr<Worker> inflightWorker = WorkersManager::sharedInstance()-> getbackgroundWorkers()[inflightIndex];
+    inflightWorker -> enqueue([&]() {
+        chunkManager.loadChunksIfNeeded(this -> camera->getCameraPosition().x, this -> camera->getCameraPosition().z);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    });
+    inflightCount = inflightIndex + 1;
+    
     masterRender.draw(camera, frameBuffer);
     fpsCounter.update();
 }
@@ -35,10 +47,4 @@ void World::setCamera(Camera* camera) {
 }
 
 void World::cameraDidUpdatedHandle() {
-    int inflightIndex = inflightCount % WORKER_COUNT;
-    std::shared_ptr<Worker> inflightWorker = WorkersManager::sharedInstance()-> getbackgroundWorkers()[inflightIndex];
-    inflightWorker -> enqueue([&]() {
-        chunkManager.loadChunksIfNeeded(this -> camera->getCameraPosition().x, this -> camera->getCameraPosition().z);
-    });
-    inflightCount = inflightIndex + 1;
 }

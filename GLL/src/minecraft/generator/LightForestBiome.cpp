@@ -11,11 +11,11 @@ LightForest::LightForest(int seed) : Biome(getNoiseParameters(), 60, 80, seed) {
     
 }
 
-ChunkBlock LightForest::getTopBlock(Rand& rand) const {
+BlockId LightForest::getTopBlock(Rand& rand) const {
     return BlockId_Grass;
 }
 
-ChunkBlock LightForest::getUnderWaterBlock(Rand& rand) const {
+BlockId LightForest::getUnderWaterBlock(Rand& rand) const {
     return rand.intInRange(0, 10) > 9 ? BlockId_Sand : BlockId_Dirt;
 }
 
@@ -33,6 +33,6 @@ NoiseParameters LightForest::getNoiseParameters() {
     return heightParams;
 }
 
-ChunkBlock LightForest::getPlant(Rand& rand) const {
+BlockId LightForest::getPlant(Rand& rand) const {
     return rand.intInRange(0, 10) > 8 ? BlockId_Rose : BlockId_TallGrass;
 }

@@ -18,60 +18,53 @@ ChunkMesh::~ChunkMesh() {
 
 void ChunkMesh::makeMesh() {
     switch (direction) {
-        case ChunkMeshFaceDirection_PositiveY: // top
-        {
+        case ChunkMeshFaceDirection_PositiveY: {
             
             makeVertices(topFace, TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.topTextureCoords), LIGHT_TOP, position);
         }
             break;
             
-        case ChunkMeshFaceDirection_NegativeY: // bottom
-        {
+        case ChunkMeshFaceDirection_NegativeY: {
             makeVertices(bottomFace, TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.bottomTextureCoords), LIGHT_BOT, position);
         }
             
             break;
             
-        case ChunkMeshFaceDirection_NegativeX: //left
-        {
+        case ChunkMeshFaceDirection_NegativeX: {
             makeVertices(leftFace, TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.sideTextrueCoords), LIGHT_X, position);
         }
             
             break;
             
-        case ChunkMeshFaceDirection_PositiveX: //right
-        {
+        case ChunkMeshFaceDirection_PositiveX: {
             makeVertices(rightFace, TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.sideTextrueCoords), LIGHT_X, position);
             
         }
             break;
             
-        case ChunkMeshFaceDirection_PositiveZ: // front
-        {
+        case ChunkMeshFaceDirection_PositiveZ: {
             makeVertices(frontFace, TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.sideTextrueCoords), LIGHT_Z, position);
         }
             break;
             
-        case ChunkMeshFaceDirection_NegativeZ: //back
-        {
+        case ChunkMeshFaceDirection_NegativeZ: {
             makeVertices(backFace, TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.sideTextrueCoords), LIGHT_Z, position);
         }
             
             break;
             
-        case ChunkMeshFaceDirection_XZ: // xface1
-        {
+        case ChunkMeshFaceDirection_XZ: {
             makeVertices(xFace1, TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.topTextureCoords), LIGHT_X, position);
         }
             break;
             
-        case ChunkMeshFaceDirection_ZX: // xface2
-        {
+        case ChunkMeshFaceDirection_ZX: {
             makeVertices(xFace2,TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.topTextureCoords), LIGHT_X, position);
         }
             break;
     }
 }
+
 
 void ChunkMesh::makeVertices( const std::vector<glm::vec3>& face, const std::vector<glm::vec2>& texCoords, const GLfloat& cardinalLight, const glm::vec3& position) {
     for (int i = 0; i <  4; i ++) {
@@ -135,7 +128,6 @@ void ChunkMesh::bindMeshVAO() {
 std::vector<GLL::ChunkMesh::ChunkMeshVertex> ChunkMesh::getVertices() const {
     return this -> vertices;
 }
-
 
 GLL::ChunkMesh::ChunkMeshFaceDirection ChunkMesh::getDirection() const {
     return this -> direction;

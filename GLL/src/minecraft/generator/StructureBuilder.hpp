@@ -27,7 +27,7 @@ namespace GLL {
         void fill(int y, int xStart, int xEnd, int zStart, int zEnd, BlockId block);
         void addBlock(int x, int y, int z, BlockId block);
     private:
-        std::vector<Block> m_blocks;
+        std::vector<Block> blocks;
     };
 }
 

@@ -7,11 +7,11 @@ using namespace GLL;
 TemperateForestBiome::TemperateForestBiome(int seed) :
 Biome(getNoiseParameters(), 55, 75, seed) { }
 
-ChunkBlock TemperateForestBiome::getTopBlock(Rand& rand) const {
+BlockId TemperateForestBiome::getTopBlock(Rand& rand) const {
     return rand.intInRange(0, 10) < 8 ? BlockId_Grass : BlockId_Dirt;
 }
 
-ChunkBlock TemperateForestBiome::getUnderWaterBlock(Rand& rand) const {
+BlockId TemperateForestBiome::getUnderWaterBlock(Rand& rand) const {
     return rand.intInRange(0, 10) > 8 ? BlockId_Dirt: BlockId_Sand;
 }
 
@@ -29,6 +29,6 @@ NoiseParameters TemperateForestBiome::getNoiseParameters() {
     return heightParams;
 }
 
-ChunkBlock TemperateForestBiome::getPlant(Rand& rand) const {
+BlockId TemperateForestBiome::getPlant(Rand& rand) const {
     return BlockId_TallGrass;
 }

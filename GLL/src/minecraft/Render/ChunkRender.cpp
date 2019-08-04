@@ -43,7 +43,6 @@ void ChunkRender::draw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer)
     shader.setUniformMatrix4("view", camera -> getViewMatrix());
     shader.setUniformFloat("globalTime",(float)glfwGetTime());
     
-#if INSTANCE_DRAW_ENABLED
     pthread_mutex_lock(&lock);
     if (this -> drawableMap.empty()) {
         pthread_mutex_unlock(&lock);
@@ -59,10 +58,6 @@ void ChunkRender::draw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer)
         }
     }
     pthread_mutex_unlock(&lock);
-#else
-    
-    
-#endif
 }
 
 void ChunkRender::clearDrawables() {

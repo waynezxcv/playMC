@@ -11,11 +11,11 @@ Biome  (getNoiseParameters(), 1350, 500, seed) {
     
 }
 
-ChunkBlock DesertBiome::getTopBlock(Rand& rand) const {
+BlockId DesertBiome::getTopBlock(Rand& rand) const {
     return BlockId_Sand;
 }
 
-ChunkBlock DesertBiome::getUnderWaterBlock(Rand& rand) const {
+BlockId DesertBiome::getUnderWaterBlock(Rand& rand) const {
     return BlockId_Sand;
 }
 
@@ -44,6 +44,6 @@ NoiseParameters DesertBiome::getNoiseParameters() {
     return heightParams;
 }
 
-ChunkBlock DesertBiome::getPlant(Rand& rand) const {
+BlockId DesertBiome::getPlant(Rand& rand) const {
     return BlockId_DeadShrub;
 }

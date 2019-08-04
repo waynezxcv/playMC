@@ -49,6 +49,7 @@
 		019DAB4622DA550B000CD15E /* BlockData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 019DAB4422DA550B000CD15E /* BlockData.cpp */; };
 		019DAB4922DAD88E000CD15E /* BlockDataFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 019DAB4722DAD88E000CD15E /* BlockDataFactory.cpp */; };
 		019DAB4C22DAE080000CD15E /* TextureAtlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 019DAB4A22DAE080000CD15E /* TextureAtlas.cpp */; };
+		01B02CD222F75B0A00366385 /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01B02CD022F75B0A00366385 /* Player.cpp */; };
 		01B2C86522E43EC000FCDAF2 /* SkyboxRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01B2C85F22E43EC000FCDAF2 /* SkyboxRender.cpp */; };
 		01B2C86622E43EC000FCDAF2 /* ChunkRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01B2C86122E43EC000FCDAF2 /* ChunkRender.cpp */; };
 		01B2C86722E43EC000FCDAF2 /* MasterRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01B2C86222E43EC000FCDAF2 /* MasterRender.cpp */; };
@@ -598,6 +599,8 @@
 		019DAB4822DAD88E000CD15E /* BlockDataFactory.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BlockDataFactory.hpp; sourceTree = "<group>"; };
 		019DAB4A22DAE080000CD15E /* TextureAtlas.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TextureAtlas.cpp; sourceTree = "<group>"; };
 		019DAB4B22DAE080000CD15E /* TextureAtlas.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TextureAtlas.hpp; sourceTree = "<group>"; };
+		01B02CD022F75B0A00366385 /* Player.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Player.cpp; sourceTree = "<group>"; };
+		01B02CD122F75B0A00366385 /* Player.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Player.hpp; sourceTree = "<group>"; };
 		01B2C85F22E43EC000FCDAF2 /* SkyboxRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SkyboxRender.cpp; sourceTree = "<group>"; };
 		01B2C86022E43EC000FCDAF2 /* SkyboxRender.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SkyboxRender.hpp; sourceTree = "<group>"; };
 		01B2C86122E43EC000FCDAF2 /* ChunkRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ChunkRender.cpp; sourceTree = "<group>"; };
@@ -661,6 +664,8 @@
 		0101F76522F549D2004C5381 /* player */ = {
 			isa = PBXGroup;
 			children = (
+				01B02CD122F75B0A00366385 /* Player.hpp */,
+				01B02CD022F75B0A00366385 /* Player.cpp */,
 			);
 			path = player;
 			sourceTree = "<group>";
@@ -746,6 +751,8 @@
 			isa = PBXGroup;
 			children = (
 				019A8B9222E0EAEF0073D2E8 /* ChunkDefine.hpp */,
+				01096D5722EC858E00988D18 /* VectorXZ.hpp */,
+				01096D5622EC858E00988D18 /* VectorXZ.cpp */,
 				0114913E22E32CCA0043E0F8 /* ChunkManager.hpp */,
 				0114913D22E32CCA0043E0F8 /* ChunkManager.cpp */,
 				0149DAB222E6394D000C3B6C /* InstanceMeshDrawable.hpp */,
@@ -758,8 +765,6 @@
 				0132A29722E0DEDD00385779 /* ChunkBlock.cpp */,
 				0132A29B22E0DF5E00385779 /* ChunkMesh.hpp */,
 				0132A29A22E0DF5E00385779 /* ChunkMesh.cpp */,
-				01096D5722EC858E00988D18 /* VectorXZ.hpp */,
-				01096D5622EC858E00988D18 /* VectorXZ.cpp */,
 			);
 			path = Chunk;
 			sourceTree = "<group>";
@@ -1621,6 +1626,7 @@
 				01FA33A522C8A2F400C76D08 /* FrameBufferCache.cpp in Sources */,
 				015B3E1D22DA31470091CBBB /* CubeTexture.cpp in Sources */,
 				0101F76D22F54DB1004C5381 /* FPSCounter.cpp in Sources */,
+				01B02CD222F75B0A00366385 /* Player.cpp in Sources */,
 				013BE88322C14D7300695FF8 /* glm.cpp in Sources */,
 				01096D5822EC858E00988D18 /* VectorXZ.cpp in Sources */,
 				0132A29322E0DECA00385779 /* Chunk.cpp in Sources */,
