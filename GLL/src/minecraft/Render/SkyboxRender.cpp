@@ -74,8 +74,6 @@ faceImageNames(faceImageNames) {
     renderInit();
 }
 
-
-
 SkyboxRender::~SkyboxRender() {
     Render::~Render();
     glDeleteTextures(1, &texutureHandle);
@@ -85,10 +83,10 @@ SkyboxRender::~SkyboxRender() {
     faceImageNames.empty();
 }
 
-
 void SkyboxRender::renderInit() {
     
     this -> shader.compile();
+    
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
@@ -97,10 +95,8 @@ void SkyboxRender::renderInit() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, (void *)0);
     glEnableVertexAttribArray(0);
     
-    
     glGenTextures(1, &texutureHandle);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texutureHandle);
-    
     
     int i = 0;
     for (std::vector<std::string>::iterator it = faceImageNames.begin(); it != faceImageNames.end(); it ++) {
@@ -130,6 +126,7 @@ void SkyboxRender::renderInit() {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
+
 
 void SkyboxRender::draw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer) {
     glDisable(GL_DEPTH_TEST);

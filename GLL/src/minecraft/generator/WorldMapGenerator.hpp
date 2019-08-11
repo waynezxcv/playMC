@@ -23,7 +23,7 @@ namespace GLL {
     public:
         
         WorldMapGenerator();
-        void generateTerrainFor(Chunk& chunk) override;
+        void generateTerrainFor(std::shared_ptr<Chunk> chunk) override;
         int  getMinimumSpawnHeight() const noexcept override;
         
     private:
@@ -34,7 +34,7 @@ namespace GLL {
         void getBiomeMap ();
         const Biome& getBiome(int x, int z) const;
         Array2D<int, CHUNK_SIZE> m_heightMap;
-        Array2D<int, CHUNK_SIZE + 1> m_biomeMap;
+        Array2D<int, CHUNK_SIZE + 1> biomeMap;
         Random<std::minstd_rand> m_random;
         
     private:
@@ -44,7 +44,8 @@ namespace GLL {
         DesertBiome desertBiome;
         OceanBiome oceanBiome;
         LightForest lightForest;
-        Chunk* chunk = nullptr;
+        GrasslandBiome grasslandBiome;
+        std::shared_ptr<Chunk> chunk;
     };
     
     

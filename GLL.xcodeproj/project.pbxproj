@@ -33,6 +33,7 @@
 		013DE5A422C2773700A22DD5 /* libassimp.4.1.0.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 013DE5A222C2773600A22DD5 /* libassimp.4.1.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		013EBEED22D22C5500108D3C /* ModelRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 013EBEEB22D22C5500108D3C /* ModelRender.cpp */; };
 		0142ADEB22E47DAD008FB3E4 /* BiomeGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0142ADE922E47DAD008FB3E4 /* BiomeGenerator.cpp */; };
+		01455A1922FEF1C800DC9EA4 /* VectorXYZ.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01455A1722FEF1C800DC9EA4 /* VectorXYZ.cpp */; };
 		01476C6F22D25F43000DDC15 /* InstanceRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01476C6D22D25F43000DDC15 /* InstanceRender.cpp */; };
 		0149DAB322E6394D000C3B6C /* InstanceMeshDrawable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0149DAB122E6394D000C3B6C /* InstanceMeshDrawable.cpp */; };
 		0154D92A22C1525A000D6755 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0154D92922C1525A000D6755 /* Cocoa.framework */; };
@@ -540,6 +541,9 @@
 		0142ADE922E47DAD008FB3E4 /* BiomeGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BiomeGenerator.cpp; sourceTree = "<group>"; };
 		0142ADEA22E47DAD008FB3E4 /* BiomeGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BiomeGenerator.hpp; sourceTree = "<group>"; };
 		0142ADED22E47DC4008FB3E4 /* TerrainGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TerrainGenerator.hpp; sourceTree = "<group>"; };
+		01455A1722FEF1C800DC9EA4 /* VectorXYZ.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VectorXYZ.cpp; sourceTree = "<group>"; };
+		01455A1822FEF1C800DC9EA4 /* VectorXYZ.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = VectorXYZ.hpp; sourceTree = "<group>"; };
+		01455A1B22FF1C0900DC9EA4 /* InstanceMeshCollection.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = InstanceMeshCollection.hpp; sourceTree = "<group>"; };
 		01476C6D22D25F43000DDC15 /* InstanceRender.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = InstanceRender.cpp; sourceTree = "<group>"; };
 		01476C6E22D25F43000DDC15 /* InstanceRender.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = InstanceRender.hpp; sourceTree = "<group>"; };
 		01476C7522D26132000DDC15 /* planet_Quom1200.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = planet_Quom1200.png; sourceTree = "<group>"; };
@@ -739,10 +743,13 @@
 		0132A27922DE231000385779 /* World */ = {
 			isa = PBXGroup;
 			children = (
-				01DD4E4022F66E1A000DC5CF /* WorkersManager.hpp */,
-				01DD4E3F22F66E1A000DC5CF /* WorkersManager.cpp */,
 				019DAB2722DA3DED000CD15E /* World.hpp */,
 				019DAB2622DA3DED000CD15E /* World.cpp */,
+				01455A1B22FF1C0900DC9EA4 /* InstanceMeshCollection.hpp */,
+				0149DAB222E6394D000C3B6C /* InstanceMeshDrawable.hpp */,
+				0149DAB122E6394D000C3B6C /* InstanceMeshDrawable.cpp */,
+				01DD4E4022F66E1A000DC5CF /* WorkersManager.hpp */,
+				01DD4E3F22F66E1A000DC5CF /* WorkersManager.cpp */,
 			);
 			path = World;
 			sourceTree = "<group>";
@@ -753,10 +760,10 @@
 				019A8B9222E0EAEF0073D2E8 /* ChunkDefine.hpp */,
 				01096D5722EC858E00988D18 /* VectorXZ.hpp */,
 				01096D5622EC858E00988D18 /* VectorXZ.cpp */,
+				01455A1822FEF1C800DC9EA4 /* VectorXYZ.hpp */,
+				01455A1722FEF1C800DC9EA4 /* VectorXYZ.cpp */,
 				0114913E22E32CCA0043E0F8 /* ChunkManager.hpp */,
 				0114913D22E32CCA0043E0F8 /* ChunkManager.cpp */,
-				0149DAB222E6394D000C3B6C /* InstanceMeshDrawable.hpp */,
-				0149DAB122E6394D000C3B6C /* InstanceMeshDrawable.cpp */,
 				0132A29222E0DECA00385779 /* Chunk.hpp */,
 				0132A29122E0DECA00385779 /* Chunk.cpp */,
 				0132A29522E0DED500385779 /* ChunkSection.hpp */,
@@ -1300,13 +1307,13 @@
 		0142ADE822E47D42008FB3E4 /* generator */ = {
 			isa = PBXGroup;
 			children = (
+				0142ADED22E47DC4008FB3E4 /* TerrainGenerator.hpp */,
 				010E872522E4B1D800455494 /* WorldMapGenerator.hpp */,
 				010E872422E4B1D800455494 /* WorldMapGenerator.cpp */,
 				010E872B22E4B3F400455494 /* GeneralMaths.hpp */,
 				010E872A22E4B3F400455494 /* GeneralMaths.cpp */,
 				019A8B8F22E0E9820073D2E8 /* PerlinNoise.hpp */,
 				019A8B8E22E0E9820073D2E8 /* PerlinNoise.cpp */,
-				0142ADED22E47DC4008FB3E4 /* TerrainGenerator.hpp */,
 				0142ADEA22E47DAD008FB3E4 /* BiomeGenerator.hpp */,
 				0142ADE922E47DAD008FB3E4 /* BiomeGenerator.cpp */,
 				01B5D62B22E4A9B10010F88D /* StructureBuilder.hpp */,
@@ -1356,10 +1363,10 @@
 			isa = PBXGroup;
 			children = (
 				017E803A22EF3F1400D025CD /* Worker.hpp */,
+				010E872822E4B32D00455494 /* Array2D.hpp */,
 				0101F76822F54A60004C5381 /* RandomSingleton.hpp */,
 				0101F76922F54A60004C5381 /* RandomSingleton.cpp */,
 				0154D93622C15358000D6755 /* FileManager.hpp */,
-				010E872822E4B32D00455494 /* Array2D.hpp */,
 				013BE6C822C14D6B00695FF8 /* NonCopyable.hpp */,
 				0101F76C22F54DB1004C5381 /* FPSCounter.hpp */,
 				0101F76B22F54DB1004C5381 /* FPSCounter.cpp */,
@@ -1653,6 +1660,7 @@
 				0142ADEB22E47DAD008FB3E4 /* BiomeGenerator.cpp in Sources */,
 				013EBEED22D22C5500108D3C /* ModelRender.cpp in Sources */,
 				01B2C86522E43EC000FCDAF2 /* SkyboxRender.cpp in Sources */,
+				01455A1922FEF1C800DC9EA4 /* VectorXYZ.cpp in Sources */,
 				01B5D62C22E4A9B10010F88D /* StructureBuilder.cpp in Sources */,
 				019DAB4C22DAE080000CD15E /* TextureAtlas.cpp in Sources */,
 				015B3E1A22DA313E0091CBBB /* BasicTexture.cpp in Sources */,

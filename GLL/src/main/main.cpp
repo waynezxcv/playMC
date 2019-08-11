@@ -16,7 +16,6 @@ int main(int argc, char *argv[]) {
     GLL::Application<GLL::World> app(config);
     app.start();
 
-
     return 0;
 }
 

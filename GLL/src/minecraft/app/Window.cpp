@@ -90,7 +90,6 @@ void Window::runloop() {
     
     while (!glfwWindowShouldClose(this->glfwWindow)) {
         
-        
         TextureParameterOptions options = FrameBuffer::getDefaultTextureOptions();
         std::shared_ptr<FrameBuffer> inFlightFrameBuffer = FrameBufferCache::sharedInstance() -> fetchFrameBuffer(currentFrameBufferSize, options);
         
@@ -111,7 +110,7 @@ void Window::runloop() {
         glfwSwapBuffers(this->glfwWindow);
         glfwPollEvents();
         inFlightFrameBuffer  -> unlock();
-        
+                
     }
     glfwTerminate();
 }

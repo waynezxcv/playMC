@@ -9,10 +9,12 @@
 #include <unordered_map>
 #include "ChunkSection.hpp"
 #include "WorldMapGenerator.hpp"
+#include "VectorXZ.hpp"
 
 namespace GLL {
     
     class ChunkManager;
+    class InstanceMeshDrawable;
     
     /// Chunk是一个由16个Section组成的结构，他包含16 * 16 * 16 *16个block
     class Chunk : public std::enable_shared_from_this<Chunk> {
@@ -22,6 +24,11 @@ namespace GLL {
     public:
         Chunk(const GLfloat& x, const GLfloat& z);
         ~Chunk();
+        
+        void makeInstanceMeshes();
+        void deleteInstanceMeshes();
+        bool getHasInstanceMeshesMade() const;
+        std::vector<std::shared_ptr<InstanceMeshDrawable>>& getInstanceMeshes();
         
     public:
         /// 遍历chunk中的section
@@ -33,27 +40,45 @@ namespace GLL {
         /// @param x 世界坐标x
         /// @param y 世界坐标y
         /// @param z 世界坐标z
-        void setBlock(const BlockId& blockId, const GLfloat& x,  const GLfloat& y, const GLfloat& z);
+        void setBlock(const BlockId& blockId, GLfloat x,  GLfloat y, GLfloat z);
         
         /// 通过下标来获取一个section
         /// @param index section在chunk中的下标
         std::shared_ptr<ChunkSection> getSection(const int index);
-        
         
         /// 获取当前chunk的坐标值，这是一个只有x，z两个值的坐标，对应chunk的左下角的坐标
         glm::vec2 getLocation() const;
         
         /// 获取当前chunk是否已经加载过了
         bool getHasLoaded();
+        
+        /// 获取高度
+        int getHeightAt(int x, int z) const;
+        
+        /// 根据世界坐标获取到某个block
+        std::shared_ptr<ChunkBlock> getBlock(int x, int y, int z);
+        
     private:
+        std::atomic<bool> hasLoaded {false};
+        std::atomic<bool> hasMeshesMade {false};
+        
         glm::vec2 location;
-        std::atomic<bool> hasLoaded;
+        
         std::mutex sectionMapMutex;
         std::unordered_map<int, std::shared_ptr<ChunkSection>> sectionMap;
+        
+        mutable std::mutex highesetBlocksMutex;
+        std::unordered_map<VectorXZ, int> highestBlocks;
+        
+        std::vector<std::shared_ptr<InstanceMeshDrawable>> instanceMeshes;
+        
     private:
-        void setupSections();
         bool isOutOfBouds(const int index);
         void load(WorldMapGenerator& generator);
+        void setupSectionIfNeeded(int index);
+        void updateHighestBlocks(int x, int y, int z);
+        std::string keyStringForMesh(InstanceMesh mesh);
+        InstanceMesh meshWithBlock(std::shared_ptr<ChunkBlock>block);
     };
 }
 

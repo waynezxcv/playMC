@@ -5,10 +5,10 @@
 
 #include <stdio.h>
 #include <vector>
+#include <mutex>
+#include <thread>
+
 #include "Frustum.hpp"
-
-
-
 
 namespace GLL {
     
@@ -113,7 +113,8 @@ namespace GLL {
         
         // 视线平截头体
         ViewFrustum frustum;
-
+        
+        std::mutex cameraMutex;
     };
 }
 

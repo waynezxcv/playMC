@@ -10,7 +10,7 @@
 #include "Shader.hpp"
 #include "Chunk.hpp"
 #include "WorldMapGenerator.hpp"
-#include "ChunkManager.hpp"
+#include "InstanceMeshDrawable.hpp"
 
 
 
@@ -21,15 +21,15 @@ namespace GLL {
         ChunkRender(const std::string& vertexShaderName);
         ~ChunkRender();
         
-        void addInstanceDrawablesIfNeeded(std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>> pair);
+        void addInstanceMesh(std::shared_ptr<InstanceMeshDrawable> instanceMesh);
         void draw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer) override;
-        void clearDrawables();
+        void clear();
 
+        
     private:
         void renderInit() override;
         Shader shader;
-        pthread_mutex_t lock;
-        std::map<std::string, std::shared_ptr<InstanceMeshDrawable>> drawableMap;
+        std::vector<std::shared_ptr<InstanceMeshDrawable>> instanceMeshes;
     };
 }
 

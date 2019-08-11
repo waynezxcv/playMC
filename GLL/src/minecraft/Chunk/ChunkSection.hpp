@@ -25,14 +25,12 @@ namespace GLL {
         /// @param callback  回调，会依次返回block，是线程安全的
         void travesingBlocks(std::function<void(std::shared_ptr<ChunkBlock>)> callback);
         
-        
         /// 设置某个block的类型
         /// @param blockId block类型id
         /// @param x 世界坐标x
         /// @param y 世界坐标y
         /// @param z 世界坐标z
         void setBlock(const BlockId& blockId,const int& x, const int& y, const int& z);
-        
         
         
         /// 获取某个坐标点上的chunkBlock对象

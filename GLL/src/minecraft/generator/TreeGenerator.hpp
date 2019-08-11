@@ -7,9 +7,9 @@
 
 namespace GLL {
     class Chunk;
-    void makeOakTree (Chunk& chunk, Random<std::minstd_rand>& rand, int x, int y, int z);
-    void makePalmTree (Chunk& chunk, Random<std::minstd_rand>& rand, int x, int y, int z);
-    void makeCactus (Chunk& chunk, Random<std::minstd_rand>& rand, int x, int y, int z);
+    void makeOakTree (std::shared_ptr<Chunk>, Random<std::minstd_rand>& rand, int x, int y, int z);
+    void makePalmTree (std::shared_ptr<Chunk>, Random<std::minstd_rand>& rand, int x, int y, int z);
+    void makeCactus (std::shared_ptr<Chunk>, Random<std::minstd_rand>& rand, int x, int y, int z);
 }
 
 #endif /* TreeGenerator_hpp */

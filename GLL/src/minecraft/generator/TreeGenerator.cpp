@@ -8,7 +8,7 @@ namespace GLL {
     
     constexpr BlockId CACTUS = BlockId_Cactus;
 
-    void makeCactus1 (Chunk& chunk, Random<std::minstd_rand>& rand, int x, int y, int z) {
+    void makeCactus1(std::shared_ptr<Chunk> chunk, Random<std::minstd_rand>& rand, int x, int y, int z) {
         StructureBuilder builder;
         builder.makeColumn(x, z, y, rand.intInRange(4, 7), CACTUS);
         builder.build(chunk);
@@ -16,7 +16,7 @@ namespace GLL {
     
     
     
-    void makeCactus2 (Chunk& chunk, Random<std::minstd_rand>& rand, int x, int y, int z) {
+    void makeCactus2(std::shared_ptr<Chunk> chunk, Random<std::minstd_rand>& rand, int x, int y, int z) {
         StructureBuilder builder;
         int height = rand.intInRange(6, 8);
         builder.makeColumn(x, z, y, height, CACTUS);
@@ -30,7 +30,7 @@ namespace GLL {
     
     
     
-    void makeCactus3 (Chunk& chunk, Random<std::minstd_rand>& rand, int x, int y, int z) {
+    void makeCactus3(std::shared_ptr<Chunk> chunk, Random<std::minstd_rand>& rand, int x, int y, int z) {
         StructureBuilder builder;
         int height = rand.intInRange(6, 8);
         builder.makeColumn(x, z, y, height, CACTUS);
@@ -45,7 +45,7 @@ namespace GLL {
     
     
     
-    void makeOakTree(Chunk& chunk, Random<std::minstd_rand>& rand, int x, int y, int z) {
+    void makeOakTree(std::shared_ptr<Chunk> chunk, Random<std::minstd_rand>& rand, int x, int y, int z) {
         StructureBuilder builder;
         int h = rand.intInRange(4, 7);
         int leafSize = 2;
@@ -64,7 +64,7 @@ namespace GLL {
         builder.build(chunk);
     }
     
-    void makePalmTree(Chunk& chunk, Random<std::minstd_rand>& rand, int x, int y, int z) {
+    void makePalmTree(std::shared_ptr<Chunk> chunk, Random<std::minstd_rand>& rand, int x, int y, int z) {
         
         StructureBuilder builder;
         int height = rand.intInRange(7, 9);
@@ -88,7 +88,7 @@ namespace GLL {
     }
     
     
-    void makeCactus(Chunk& chunk, Random<std::minstd_rand>& rand, int x, int y, int z) {
+    void makeCactus(std::shared_ptr<Chunk> chunk, Random<std::minstd_rand>& rand, int x, int y, int z) {
         int cac = rand.intInRange(0, 2);
         switch (cac) {
             case 0:

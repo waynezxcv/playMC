@@ -5,9 +5,9 @@
 using namespace GLL;
 
 
-void StructureBuilder::build(Chunk& chunk) {
+void StructureBuilder::build(std::shared_ptr<Chunk> chunk) {
     for (auto& block : blocks) {
-        chunk.setBlock(block.id, block.x, block.y, block.z);
+        chunk -> setBlock(block.id, block.x, block.y, block.z);
     }
 }
 

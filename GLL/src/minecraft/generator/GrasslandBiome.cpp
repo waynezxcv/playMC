@@ -24,7 +24,7 @@ BlockId GrasslandBiome::getBeachBlock (Rand& rand) const {
 
 
 
-void GrasslandBiome::makeTree(Rand& rand, Chunk& chunk, int x, int y, int z) const {
+void GrasslandBiome::makeTree(Rand& rand, std::shared_ptr<Chunk> chunk, int x, int y, int z) const {
     makeOakTree(chunk, rand, x, y, z);
 }
 

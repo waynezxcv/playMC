@@ -9,54 +9,53 @@
 #include <pthread.h>
 
 #include "VectorXZ.hpp"
+#include "VectorXYZ.hpp"
+
 #include "NonCopyable.hpp"
 #include "Chunk.hpp"
 #include "WorldMapGenerator.hpp"
-#include "InstanceMeshDrawable.hpp"
-
 
 namespace GLL {
     
     class World;
     class ChunkRender;
+    class Camera;
     
     class ChunkManager  {
+        friend World;
     public:
-        ChunkManager(ChunkRender* chunkRender, ChunkRender* liquidRender, ChunkRender* floraRender);
+        ChunkManager();
         ~ChunkManager();
-        void loadChunksIfNeeded(int x, int z);
-        void unloadChunksIfNeeded(const glm::vec3& cameraPosition);
+        // 获取某个block，如果还没有创建，则会返回nullptr
+        std::shared_ptr<ChunkBlock> getBlock(int x,int y,int z);
+        std::vector<std::shared_ptr<ChunkBlock>> getBlocks();
+        void travesingBlocks(std::function<void(std::shared_ptr<ChunkBlock>)> callback);
+        void traviesingChunks(std::function<void(std::shared_ptr<Chunk>)> callback);
         
     private:
-        // locks & containers
-        pthread_mutex_t chunkMapLock;
+        
+        // chunk容器，key是对应的坐标，value是chunk对象
+        std::mutex chunkMapMutex;
         std::unordered_map<VectorXZ, std::shared_ptr<Chunk>> chunkMap;
         
-        pthread_mutex_t blocksLock;
+        // blocks容器
+        std::mutex blocksMutex;
         std::vector<std::shared_ptr<ChunkBlock>> blocks;
-        
-        pthread_mutex_t instanceLock;
-        std::map<std::string, std::shared_ptr<InstanceMeshDrawable>> instanceMeshDrawables;
-        
-        // renders
-        ChunkRender* chunkRender;
-        ChunkRender* liquidRender;
-        ChunkRender* floraRender;
-        
         // others
         WorldMapGenerator worldGenerator;
         
     private:
+        bool loadChunk(int x, int z);
+        void unloadChunk(int x, int z);
+        void updateNeedRenderChunks(Camera* camera);
+        
         bool chunkExistAt(int x, int z);
         bool chunkHasLoadedAt(int x, int z);
-        bool loadChunk(int x, int z);
-        void intenalLoadChunk(int x, int z);
-        void unloadChunk(int x, int z);
+        unsigned int getChunksCount();
         
         WorldMapGenerator& getWorldGenerator();
-        std::string keyStringForMesh(InstanceMesh mesh);
         std::shared_ptr<Chunk> getChunk(int x, int z);
-        std::vector<std::shared_ptr<ChunkBlock>> getBlocks();
+        VectorXZ normalizeChunkCoordination(int x, int z);
     };
 }
 

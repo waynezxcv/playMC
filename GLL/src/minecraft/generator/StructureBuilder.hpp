@@ -20,7 +20,7 @@ namespace GLL {
         
         
     public:
-        void build(Chunk& chunk);
+        void build(std::shared_ptr<Chunk>);
         void makeColumn(int x, int z, int yStart, int height, BlockId block);
         void makeRowX(int xStart, int xEnd, int y, int z, BlockId block);
         void makeRowZ(int zStart, int zEnd, int x, int y, BlockId block);

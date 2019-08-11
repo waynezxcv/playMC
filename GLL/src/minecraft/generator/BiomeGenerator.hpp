@@ -24,7 +24,7 @@ namespace GLL {
         virtual BlockId getTopBlock (Random<std::minstd_rand>& rand) const = 0;
         virtual BlockId getUnderWaterBlock (Random<std::minstd_rand>& rand) const = 0;
         virtual BlockId getBeachBlock (Random<std::minstd_rand>& rand) const;
-        virtual void makeTree (Random<std::minstd_rand>& rand, Chunk& chunk, int x, int y, int z) const = 0;
+        virtual void makeTree (Random<std::minstd_rand>& rand, std::shared_ptr<Chunk>, int x, int y, int z) const = 0;
         
         int getHeight(int x, int z, int chunkX, int chunkZ) const;
         int getTreeFrequency () const noexcept;

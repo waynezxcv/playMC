@@ -8,6 +8,9 @@
 #include "MasterRender.hpp"
 #include "ChunkManager.hpp"
 #include "FPSCounter.hpp"
+#include "Player.hpp"
+#include "InstanceMeshCollection.hpp"
+
 
 
 namespace GLL {
@@ -21,22 +24,21 @@ namespace GLL {
         
         MasterRender& getMasterRender();
         ChunkManager& getChunkManager();
-        
     private:
-        
         MasterRender masterRender;
         ChunkManager chunkManager;
         glm::vec3 playerSpawnPoint;
-        
+        InstanceMeshCollection meshCollection;
+
         int loadDistance = 2;
-        int renderDistance = 16;
-        
         Camera* camera;
         FPSCounter fpsCounter;
-        std::atomic<int> inflightCount;
+        std::atomic<int> inflightCount {0};
         
     private:
-        void cameraDidUpdatedHandle();
+        void setSpawnPoint();
+        void loadChunks(Camera* camera);
+        void setupMeshInstances();
     };
 }
 

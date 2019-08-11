@@ -19,8 +19,7 @@ BlockId DesertBiome::getUnderWaterBlock(Rand& rand) const {
     return BlockId_Sand;
 }
 
-void DesertBiome::makeTree(Rand& rand, Chunk& chunk, int x, int y, int z) const {
-    
+void DesertBiome::makeTree(Rand& rand, std::shared_ptr<Chunk> chunk, int x, int y, int z) const {
     if (y < WATER_LEVEL + 15) {
         if (rand.intInRange(0, 100) > 75) {
             makePalmTree(chunk, rand, x, y, z);

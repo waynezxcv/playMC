@@ -38,8 +38,9 @@ void ChunkSection::setupBlocks() {
             for (int k = 0; k < CHUNK_SIZE; k ++) {
                 glm::vec3 blockPositionInWorld = glm::vec3{parentChunkPosition.x + i, indexOfParentChunkSections * CHUNK_SIZE + j + CHUNK_ORIGN_Y, parentChunkPosition.y + k};
                 std::shared_ptr<ChunkBlock> block = std::make_shared<ChunkBlock> (weakSelf, BlockId_Air, glm::vec3{i,j,k}, blockPositionInWorld);
+                auto index = getBlockIndexWithBlockPosition(block -> getBlockPositionInSection().x, block -> getBlockPositionInSection().y, block -> getBlockPositionInSection().z);
                 std::lock_guard<std::mutex> lock(this -> blockArrayMutex);
-                blockArray[getBlockIndexWithBlockPosition(block -> getBlockPositionInSection().x, block -> getBlockPositionInSection().y, block -> getBlockPositionInSection().z)] = block;
+                this -> blockArray.at(index) = std::move(block);
             }
         }
     }
@@ -47,8 +48,7 @@ void ChunkSection::setupBlocks() {
 
 void ChunkSection::travesingBlocks(std::function<void(std::shared_ptr<ChunkBlock>)> callback) {
     std::lock_guard<std::mutex> lock(this -> blockArrayMutex);
-    for (auto interator = blockArray.begin(); interator != blockArray.end(); ++ interator) {
-        std::shared_ptr<ChunkBlock> block = *interator;
+    for (auto block : blockArray) {
         if (callback) {
             callback(block);
         }
@@ -60,7 +60,8 @@ void ChunkSection::setBlock(const BlockId& blockId,const int& x, const int& y, c
         return;
     }
     std::lock_guard<std::mutex> lock(this -> blockArrayMutex);
-    std::shared_ptr<ChunkBlock> block = blockArray[getBlockIndexWithBlockPosition(x, y, z)];
+    auto index = getBlockIndexWithBlockPosition(x, y, z);
+    std::shared_ptr<ChunkBlock> block = this -> blockArray.at(index);
     block -> updateBlockId(blockId);
 }
 
@@ -70,7 +71,8 @@ std::shared_ptr<ChunkBlock> ChunkSection::getBlock(const int& x, const int& y, c
     if (isOutOfBounds(x, y, z)) {
         return nullptr;
     }
-    std::shared_ptr<ChunkBlock> block = blockArray[getBlockIndexWithBlockPosition(x,y,z)];
+    auto index = getBlockIndexWithBlockPosition(x, y, z);
+    std::shared_ptr<ChunkBlock> block = this -> blockArray.at(index);
     return block;
 }
 
@@ -94,7 +96,6 @@ bool ChunkSection::isOutOfBounds(const int& x, const int& y, const int& z) {
     }
     return false;
 }
-
 
 int ChunkSection::getBlockIndexWithBlockPosition(const int& x, const int& y, const int& z) const {
     return y * CHUNK_AREA + z * CHUNK_SIZE + x;

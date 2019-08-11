@@ -15,7 +15,7 @@ BlockId TemperateForestBiome::getUnderWaterBlock(Rand& rand) const {
     return rand.intInRange(0, 10) > 8 ? BlockId_Dirt: BlockId_Sand;
 }
 
-void TemperateForestBiome::makeTree(Rand& rand, Chunk& chunk, int x, int y, int z) const {
+void TemperateForestBiome::makeTree(Rand& rand, std::shared_ptr<Chunk> chunk, int x, int y, int z) const {
     makeOakTree(chunk, rand, x, y, z);
 }
 

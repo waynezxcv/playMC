@@ -169,7 +169,7 @@ void InstanceMeshDrawable::instanceDraw(Camera *camera, std::shared_ptr<FrameBuf
 }
 
 void InstanceMeshDrawable::addOffset(const glm::vec3& offset) {
-    this -> offsetsMutex.lock();
+    this -> offsetsMutex.lock();    
     offsets.push_back(offset);
     if (offsets.size() > MAX_OFFSETS_DATA_SIZE) {
         std::cout<<"[ERROR] the offsets is heap over flow ... "<<std::endl;

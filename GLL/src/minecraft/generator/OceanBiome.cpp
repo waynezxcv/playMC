@@ -19,7 +19,7 @@ BlockId OceanBiome::getUnderWaterBlock(Rand& rand) const {
 }
 
 
-void OceanBiome::makeTree(Rand& rand, Chunk& chunk, int x, int y, int z) const {
+void OceanBiome::makeTree(Rand& rand, std::shared_ptr<Chunk> chunk, int x, int y, int z) const {
     rand.intInRange(0, 5) < 3 ?
     makePalmTree(chunk, rand, x, y, z) :
     makeOakTree (chunk, rand, x, y, z);

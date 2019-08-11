@@ -23,7 +23,9 @@ grassBiome (seed),
 temperateForest (seed),
 desertBiome (seed),
 oceanBiome (seed),
-lightForest (seed) {
+lightForest (seed),
+grasslandBiome(seed)
+{
     setUpNoise();
 }
 
@@ -44,12 +46,11 @@ void WorldMapGenerator::setUpNoise() {
     }
 }
 
-void WorldMapGenerator::generateTerrainFor(Chunk& chunk) {
+void WorldMapGenerator::generateTerrainFor(std::shared_ptr<Chunk> chunk) {
+    this -> chunk = chunk;
+    auto location = chunk -> getLocation();
     
-    this -> chunk = &chunk;
-    auto location = chunk.getLocation();
     m_random.setSeed(((int)location.x ^ (int)location.y) << 2);
-    
     getBiomeMap();
     getHeightMap();
     
@@ -108,7 +109,7 @@ void WorldMapGenerator::getBiomeMap() {
     for (int x = 0; x < CHUNK_SIZE + 1; x++) {
         for (int z = 0; z < CHUNK_SIZE + 1; z++) {
             int h = biomeNoiseGen.getHeight(x, z, location.x + 10, location.y + 10);
-            m_biomeMap.get(x, z) = h;
+            biomeMap.get(x, z) = h;
         }
     }
 }
@@ -174,23 +175,25 @@ void WorldMapGenerator::setBlocks(int maxHeight) {
     for (auto& tree : trees) {
         int x = tree.x;
         int z = tree.z;
-        getBiome(x, z).makeTree(m_random, *chunk, x, tree.y, z);
+        getBiome(x, z).makeTree(m_random,this -> chunk, x, tree.y, z);
     }
 }
 
 
 const Biome& WorldMapGenerator::getBiome(int x, int z) const {
     
-    int biomeValue = m_biomeMap.get(x, z);
+    int biomeValue = biomeMap.get(x, z);
     
     if (biomeValue > 160) {
-        return oceanBiome;
+        return grasslandBiome;
     }
     else if (biomeValue > 150) {
-        return grassBiome;
+        return lightForest;
+
     }
     else if (biomeValue > 130) {
-        return lightForest;
+        return grassBiome;
+
     }
     else if (biomeValue > 120) {
         return temperateForest;
@@ -199,10 +202,10 @@ const Biome& WorldMapGenerator::getBiome(int x, int z) const {
         return lightForest;
     }
     else if (biomeValue > 100) {
-        return grassBiome;
+        return desertBiome;
     }
     else {
-        return desertBiome;
+        return oceanBiome;
     }
     
 }
