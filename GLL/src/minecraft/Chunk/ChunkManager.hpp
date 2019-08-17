@@ -33,7 +33,6 @@ namespace GLL {
         void traviesingChunks(std::function<void(std::shared_ptr<Chunk>)> callback);
         
     private:
-        
         // chunk容器，key是对应的坐标，value是chunk对象
         std::mutex chunkMapMutex;
         std::unordered_map<VectorXZ, std::shared_ptr<Chunk>> chunkMap;
@@ -41,13 +40,14 @@ namespace GLL {
         // blocks容器
         std::mutex blocksMutex;
         std::vector<std::shared_ptr<ChunkBlock>> blocks;
+        
         // others
         WorldMapGenerator worldGenerator;
         
     private:
         bool loadChunk(int x, int z);
         void unloadChunk(int x, int z);
-        void updateNeedRenderChunks(Camera* camera);
+        void updateNeedRenderChunks(std::shared_ptr<Camera> camera);
         
         bool chunkExistAt(int x, int z);
         bool chunkHasLoadedAt(int x, int z);

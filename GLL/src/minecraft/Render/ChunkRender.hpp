@@ -21,15 +21,16 @@ namespace GLL {
         ChunkRender(const std::string& vertexShaderName);
         ~ChunkRender();
         
-        void addInstanceMesh(std::shared_ptr<InstanceMeshDrawable> instanceMesh);
-        void draw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer) override;
+    public:
+        
+        void addDrawableIfNeeded(std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>> pair);
+        void draw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) override;
         void clear();
-
         
     private:
         void renderInit() override;
         Shader shader;
-        std::vector<std::shared_ptr<InstanceMeshDrawable>> instanceMeshes;
+        std::map<std::string, std::shared_ptr<InstanceMeshDrawable>> instanceMeshes;
     };
 }
 

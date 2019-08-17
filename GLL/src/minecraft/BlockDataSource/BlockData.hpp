@@ -29,16 +29,16 @@ namespace GLL {
     } BlockId;
     
     
-    typedef enum {
+    typedef enum : int {
         BlockShaderType_Chunck = 0,
         BlockShaderType_Liquid = 1,
         BlockShaderType_Flora = 2,
     } BlockShaderType;
     
     
-    typedef enum {
-        BlockMeshType_Cube,
-        BlockMeshType_X,
+    typedef enum  : int {
+        BlockMeshType_Cube = 0,
+        BlockMeshType_X = 1,
     } BlockMeshType;
     
     

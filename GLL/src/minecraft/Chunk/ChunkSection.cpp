@@ -5,7 +5,9 @@
 
 using namespace GLL;
 
+
 constexpr GLfloat CHUNK_ORIGN_Y = - 2 * CHUNK_SIZE;
+
 
 ChunkSection::ChunkSection(std::weak_ptr<Chunk> parentChunk, const GLuint& index) :
 parentChunk(parentChunk),
@@ -22,7 +24,6 @@ aabb({CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE})
 
 ChunkSection::~ChunkSection() {}
 
-
 void ChunkSection::setupBlocks() {
     
     if (hasLoaded == true) {
@@ -32,36 +33,66 @@ void ChunkSection::setupBlocks() {
     
     std::shared_ptr<ChunkSection> shared = shared_from_this();
     std::weak_ptr<ChunkSection> weakSelf = shared;
-    
     for (int i = 0; i < CHUNK_SIZE; i ++) {
         for (int j = 0; j < CHUNK_SIZE; j ++) {
             for (int k = 0; k < CHUNK_SIZE; k ++) {
                 glm::vec3 blockPositionInWorld = glm::vec3{parentChunkPosition.x + i, indexOfParentChunkSections * CHUNK_SIZE + j + CHUNK_ORIGN_Y, parentChunkPosition.y + k};
                 std::shared_ptr<ChunkBlock> block = std::make_shared<ChunkBlock> (weakSelf, BlockId_Air, glm::vec3{i,j,k}, blockPositionInWorld);
-                auto index = getBlockIndexWithBlockPosition(block -> getBlockPositionInSection().x, block -> getBlockPositionInSection().y, block -> getBlockPositionInSection().z);
                 std::lock_guard<std::mutex> lock(this -> blockArrayMutex);
-                this -> blockArray.at(index) = std::move(block);
+                this -> blockArray[i][j][k] = std::move(block);
             }
         }
     }
 }
 
+
 void ChunkSection::travesingBlocks(std::function<void(std::shared_ptr<ChunkBlock>)> callback) {
+    
     std::lock_guard<std::mutex> lock(this -> blockArrayMutex);
-    for (auto block : blockArray) {
-        if (callback) {
-            callback(block);
+    
+    for (int x = 0; x < CHUNK_SIZE; x ++) {
+        for (int y = 0; y < CHUNK_SIZE; y ++) {
+            for (int z = 0; z < CHUNK_SIZE; z ++) {
+                
+                std::shared_ptr<ChunkBlock> block = this -> blockArray[x][y][z];
+                if (x > 0 && blockArray[x - 1][y][z] != nullptr) {
+                    block->leftBlockId = blockArray[x - 1][y][z] -> getBlockData().blockId;
+                }
+                if(x < CHUNK_SIZE - 1 && blockArray[x + 1][y][z] != nullptr) /* Face X+ */ {
+                    block->rightBlockId = blockArray[x + 1][y][z] -> getBlockData().blockId;
+                }
+                
+                if(y > 0 && blockArray[x][y - 1][z] != nullptr) /* Face Y- */ {
+                    block -> downBlockId = blockArray[x][y - 1][z] -> getBlockData().blockId;
+                }
+                
+                if(y < CHUNK_SIZE - 1  && blockArray[x][y + 1][z] != nullptr) /* Face Y+ */ {
+                    block -> upBlockId = blockArray[x][y + 1][z] -> getBlockData().blockId;
+                }
+                
+                if(z > 0 && blockArray[x][y][z - 1] != nullptr) /* Face Z- */ {
+                    block -> backBlockId = blockArray[x][y][z - 1] -> getBlockData().blockId;
+                }
+                
+                if(z < CHUNK_SIZE - 1 &&blockArray[x][y][z + 1] != nullptr) /* Face Z+ */ {
+                    block -> frontBlockId = blockArray[x][y][z + 1] -> getBlockData().blockId;
+                }
+                
+                if (callback) {
+                    callback(block);
+                }
+            }
         }
     }
 }
+
 
 void ChunkSection::setBlock(const BlockId& blockId,const int& x, const int& y, const int& z) {
     if (isOutOfBounds(x, y, z)) {
         return;
     }
     std::lock_guard<std::mutex> lock(this -> blockArrayMutex);
-    auto index = getBlockIndexWithBlockPosition(x, y, z);
-    std::shared_ptr<ChunkBlock> block = this -> blockArray.at(index);
+    std::shared_ptr<ChunkBlock> block = this -> blockArray[x][y][z];
     block -> updateBlockId(blockId);
 }
 
@@ -71,20 +102,21 @@ std::shared_ptr<ChunkBlock> ChunkSection::getBlock(const int& x, const int& y, c
     if (isOutOfBounds(x, y, z)) {
         return nullptr;
     }
-    auto index = getBlockIndexWithBlockPosition(x, y, z);
-    std::shared_ptr<ChunkBlock> block = this -> blockArray.at(index);
-    return block;
+    return this -> blockArray[x][y][z];
 }
+
 
 glm::vec2 ChunkSection::getLocation() const {
     return positionInWorld;
 }
+
 
 GLuint ChunkSection::getIndexOfParentChunkSections() const {
     return indexOfParentChunkSections;
 }
 
 bool ChunkSection::isOutOfBounds(const int& x, const int& y, const int& z) {
+    
     if (x < 0 || x >= CHUNK_SIZE) {
         return true;
     }
@@ -97,10 +129,6 @@ bool ChunkSection::isOutOfBounds(const int& x, const int& y, const int& z) {
     return false;
 }
 
-int ChunkSection::getBlockIndexWithBlockPosition(const int& x, const int& y, const int& z) const {
-    return y * CHUNK_AREA + z * CHUNK_SIZE + x;
-}
-
 std::shared_ptr<Chunk> ChunkSection::getParentChunk() {
     std::shared_ptr<Chunk> sp = nullptr;
     if ((sp = this -> parentChunk.lock())) {
@@ -109,4 +137,8 @@ std::shared_ptr<Chunk> ChunkSection::getParentChunk() {
     else {
         return nullptr;
     }
+}
+
+void ChunkSection::setNeedUpdate() {
+    this -> isNeedUpdate = true;
 }

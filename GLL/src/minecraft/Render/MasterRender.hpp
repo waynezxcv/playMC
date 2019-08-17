@@ -27,7 +27,7 @@ namespace GLL {
         
         MasterRender(World* world);
         ~MasterRender();
-        void draw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer) override;
+        void draw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) override;
         
         ChunkRender chunkRender;
         ChunkRender liquidRender;
@@ -42,7 +42,7 @@ namespace GLL {
         World* world;
     private:
         void renderInit() override;
-        void drawSubRenders(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer);
+        void drawSubRenders(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer);
     };
 }
 

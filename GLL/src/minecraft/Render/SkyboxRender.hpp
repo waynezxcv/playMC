@@ -20,7 +20,7 @@ namespace GLL {
         ~SkyboxRender();
         
         void renderInit() override;
-        void draw(Camera* camera, std::shared_ptr<FrameBuffer> frameBuffer) override;
+        void draw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) override;
         
     private:
         GLuint VBO;

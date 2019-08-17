@@ -54,7 +54,7 @@ void WorldMapGenerator::generateTerrainFor(std::shared_ptr<Chunk> chunk) {
     getBiomeMap();
     getHeightMap();
     
-    auto maxHeight = m_heightMap.getMaxValue();
+    auto maxHeight = heightMap.getMaxValue();
     maxHeight = maxHeight <= WATER_LEVEL ? WATER_LEVEL : maxHeight;
     setBlocks(maxHeight);
 }
@@ -85,7 +85,7 @@ void WorldMapGenerator::getHeightIn (int xMin, int zMin, int xMax, int zMax) {
                 continue;
             }
             float h = smoothInterpolation(bottomLeft, topLeft, bottomRight, topRight, xMin, xMax, zMin, zMax, x, z);
-            m_heightMap.get(x, z) = h;
+            heightMap.get(x, z) = h;
         }
     }
 }
@@ -123,7 +123,7 @@ void WorldMapGenerator::setBlocks(int maxHeight) {
     for (int y = 0; y < maxHeight + 1; y++) {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
-                int height = m_heightMap.get(x, z);
+                int height = heightMap.get(x, z);
                 auto& biome = getBiome(x, z);
                 
                 if (y > height) {

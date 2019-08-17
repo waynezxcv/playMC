@@ -14,9 +14,11 @@ namespace GLL {
     /*
      体积是 16 * 16 *16 的block组合体
      */
+    using ChunkBlockArrayType = std::array<std::array<std::array<std::shared_ptr<ChunkBlock>, CHUNK_SIZE>, CHUNK_SIZE>, CHUNK_SIZE>;
+    
+    
     class ChunkSection : public std::enable_shared_from_this<ChunkSection> {
         friend Chunk;
-        
     public:
         ChunkSection(std::weak_ptr<Chunk> parentChunk, const GLuint& index);
         ~ChunkSection();
@@ -33,12 +35,13 @@ namespace GLL {
         void setBlock(const BlockId& blockId,const int& x, const int& y, const int& z);
         
         
+        
         /// 获取某个坐标点上的chunkBlock对象
         /// @param x 世界坐标x
         /// @param y 世界坐标y
         /// @param z 世界坐标z
         std::shared_ptr<ChunkBlock> getBlock(const int& x, const int& y, const int& z);
-        
+
         
         /// 获取section的坐标位置
         glm::vec2 getLocation() const;
@@ -46,26 +49,32 @@ namespace GLL {
         /// 获取在父chunk中的下标号
         GLuint getIndexOfParentChunkSections() const;
         
+        
         /// 获取父级Chunk的sharedPtr
         std::shared_ptr<Chunk> getParentChunk();
         
-    private:
+        /// 设置为需要更新
+        void setNeedUpdate();
         
-        void setupBlocks();
+    private:
+        AABB aabb;
+
         std::weak_ptr<Chunk> parentChunk;
         glm::vec2 parentChunkPosition;
         glm::vec3 positionInWorld;
         GLuint indexOfParentChunkSections;
-        AABB aabb;
-        std::array<std::shared_ptr<ChunkBlock>, CHUNK_VOLUME> blockArray;
+        
+        ChunkBlockArrayType blockArray;
         std::mutex blockArrayMutex;
+        
         std::atomic<bool> hasLoaded;
+        std::atomic<bool> isNeedUpdate {false};
         
     private:
+        void setupBlocks();
         bool isOutOfBounds(const int& x, const int& y, const int& z);
         int getBlockIndexWithBlockPosition(const int& x, const int& y, const int& z) const;
     };
 }
-
 
 #endif /* ChunkSection_hpp */

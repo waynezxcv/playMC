@@ -53,7 +53,7 @@ void ModelRender::renderInit() {
 };
 
 
-void ModelRender::draw(Camera* camera,  std::shared_ptr<FrameBuffer> frameBuffer) {
+void ModelRender::draw(std::shared_ptr<Camera> camera,  std::shared_ptr<FrameBuffer> frameBuffer) {
     
     glEnable(GL_DEPTH_TEST);
 

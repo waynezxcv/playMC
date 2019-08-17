@@ -53,7 +53,7 @@ void InstanceRender::renderInit()  {
 }
 
 
-void InstanceRender::draw(Camera* camera,  std::shared_ptr<FrameBuffer> frameBuffer) {
+void InstanceRender::draw(std::shared_ptr<Camera> camera,  std::shared_ptr<FrameBuffer> frameBuffer) {
     glEnable(GL_DEPTH_TEST);
     shader.use();
     shader.setUniformVec3("cameraPosition", camera -> getCameraPosition());

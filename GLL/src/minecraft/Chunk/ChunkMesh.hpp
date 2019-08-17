@@ -89,7 +89,7 @@ namespace GLL {
     
     class ChunkMesh {
     public:
-        typedef enum {
+        typedef enum : int {
             ChunkMeshFaceDirection_PositiveY = 0,
             ChunkMeshFaceDirection_NegativeY,
             ChunkMeshFaceDirection_PositiveX,

@@ -9,36 +9,36 @@
 #include "ChunkManager.hpp"
 #include "FPSCounter.hpp"
 #include "Player.hpp"
-#include "InstanceMeshCollection.hpp"
-
 
 
 namespace GLL {
     class World {
     public:
+        std::shared_ptr<Camera> camera;
+        
+    public:
         World();
         ~World();
-        
-        void setCamera(Camera* camera);
-        void draw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer);
-        
+        void draw(std::shared_ptr<FrameBuffer> frameBuffer);
         MasterRender& getMasterRender();
         ChunkManager& getChunkManager();
+        
     private:
         MasterRender masterRender;
         ChunkManager chunkManager;
         glm::vec3 playerSpawnPoint;
-        InstanceMeshCollection meshCollection;
+        WorkersManager workersManager;
+        FPSCounter fpsCounter;
 
         int loadDistance = 2;
-        Camera* camera;
-        FPSCounter fpsCounter;
         std::atomic<int> inflightCount {0};
+        std::mutex mainMutex;
         
     private:
         void setSpawnPoint();
-        void loadChunks(Camera* camera);
+        void loadChunks(std::shared_ptr<Camera> camera);
         void setupMeshInstances();
+        
     };
 }
 

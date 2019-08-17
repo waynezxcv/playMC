@@ -14,20 +14,11 @@ namespace  {
 namespace GLL {
     class WorkersManager : public NonCopyable {
     public:
-        static WorkersManager* sharedInstance();
-        Worker* getMainWorker();
-        
+        WorkersManager();
+        ~WorkersManager();
         std::vector<std::shared_ptr<Worker>>&& getbackgroundWorkers();
-        ~WorkersManager() {
-            delete mainWorker;
-        }
-        
     private:
-        WorkersManager() {
-            setupWorkers();
-        }
         void setupWorkers();
-        Worker* mainWorker;
         std::vector<std::shared_ptr<Worker>> backgroundWorkers;
     };
 }

@@ -76,6 +76,7 @@ bool ChunkManager::loadChunk(int x, int z) {
     std::shared_ptr<Chunk> chunk = this -> getChunk(x, z);
     chunk -> load(worldGenerator);
     
+    
     // 3. 遍历chunk中的sections, 添加到block容器中
     chunk->traversingSections([&](std::shared_ptr<ChunkSection> section) -> void {
         section -> travesingBlocks([&](std::shared_ptr<ChunkBlock> block) -> void {
@@ -94,35 +95,34 @@ void ChunkManager::unloadChunk(int x, int z) {
         this -> chunkMapMutex.lock();
         chunkMap.erase(VectorXZ{x,z});
         this -> chunkMapMutex.unlock();
-        //        std::cout<<">> unload chunk at : [ "<<x<<" , "<<z<<" ]"<<std::endl;
     }
 }
 
-void ChunkManager::updateNeedRenderChunks(Camera* camera) {
-    std::lock_guard<std::mutex> lock(this -> chunkMapMutex);
-    for (auto iterator = chunkMap.begin(); iterator != chunkMap.end();) {
-        VectorXZ xz = iterator -> first;
-        std::shared_ptr<Chunk> chunk = iterator -> second;
-        glm::vec3 cameraPosition = camera -> getCameraPosition();
-        
-        int cameraX = cameraPosition.x;
-        int cameraZ = cameraPosition.z;
-        int minX = (cameraX / CHUNK_SIZE) - RENDER_DISTANCE;
-        int minZ = (cameraZ / CHUNK_SIZE) - RENDER_DISTANCE;
-        int maxX = (cameraX / CHUNK_SIZE) + RENDER_DISTANCE;
-        int maxZ = (cameraZ / CHUNK_SIZE) + RENDER_DISTANCE;
-        auto location = chunk -> getLocation();
-        
-        if (minX > location.x || minZ > location.y || maxZ < location.y || maxX < location.x) {
-            std::cout<<">> unload chunk at : [ "<<xz.x<<" , "<<xz.z<<" ]"<<std::endl;
-            iterator = chunkMap.erase(iterator);
-            continue;;
-        }
-        else {
-            // need draws
-            iterator++;
-        }
-    }
+void ChunkManager::updateNeedRenderChunks(std::shared_ptr<Camera> camera) {
+//    std::lock_guard<std::mutex> lock(this -> chunkMapMutex);
+//    for (auto iterator = chunkMap.begin(); iterator != chunkMap.end();) {
+//        VectorXZ xz = iterator -> first;
+//        std::shared_ptr<Chunk> chunk = iterator -> second;
+//        glm::vec3 cameraPosition = camera -> getCameraPosition();
+//
+//        int cameraX = cameraPosition.x;
+//        int cameraZ = cameraPosition.z;
+//        int minX = (cameraX / CHUNK_SIZE) - RENDER_DISTANCE;
+//        int minZ = (cameraZ / CHUNK_SIZE) - RENDER_DISTANCE;
+//        int maxX = (cameraX / CHUNK_SIZE) + RENDER_DISTANCE;
+//        int maxZ = (cameraZ / CHUNK_SIZE) + RENDER_DISTANCE;
+//        auto location = chunk -> getLocation();
+//
+//        if (minX > location.x || minZ > location.y || maxZ < location.y || maxX < location.x) {
+//            std::cout<<">> unload chunk at : [ "<<xz.x<<" , "<<xz.z<<" ]"<<std::endl;
+//            iterator = chunkMap.erase(iterator);
+//            continue;;
+//        }
+//        else {
+//            // need draws
+//            iterator++;
+//        }
+//    }
 }
 
 bool ChunkManager::chunkExistAt(int x, int z) {
@@ -149,6 +149,7 @@ std::shared_ptr<Chunk> ChunkManager::getChunk(int x, int z) {
     return chunk;
 }
 
+
 bool ChunkManager::chunkHasLoadedAt(int x, int z) {
     if (this -> chunkExistAt(x, z) == false) {
         return false;
@@ -159,9 +160,11 @@ bool ChunkManager::chunkHasLoadedAt(int x, int z) {
     return loaded;
 }
 
+
 WorldMapGenerator& ChunkManager::getWorldGenerator() {
     return worldGenerator;
 }
+
 
 unsigned int ChunkManager::getChunksCount() {
     this -> chunkMapMutex.lock();

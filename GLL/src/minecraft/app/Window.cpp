@@ -1,6 +1,5 @@
 
 #include "Window.hpp"
-#include "WorkersManager.hpp"
 
 
 float lastX = WINDOW_WIDTH / 2.0f;

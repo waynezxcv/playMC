@@ -141,12 +141,11 @@ void InstanceMeshDrawable::makeVertices(const std::vector<glm::vec3>& face, cons
     }
 }
 
-void InstanceMeshDrawable::instanceDraw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer) {
+void InstanceMeshDrawable::instanceDraw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) {
     if (dataBuffered == false) {
         bufferData();
         dataBuffered = true;
     }
-    
     this -> offsetsMutex.lock();
     GLint offsetsSzie = (GLint)offsets.size();
     this -> offsetsMutex.unlock();
@@ -168,9 +167,12 @@ void InstanceMeshDrawable::instanceDraw(Camera *camera, std::shared_ptr<FrameBuf
     TextureAtlas::sharedInstance().unbindTexture();
 }
 
-void InstanceMeshDrawable::addOffset(const glm::vec3& offset) {
-    this -> offsetsMutex.lock();    
-    offsets.push_back(offset);
+void InstanceMeshDrawable::addOffsetIfNeeded(const glm::vec3& offset) {
+    this -> offsetsMutex.lock();
+    bool isContained = std::find(offsets.begin(), offsets.end(), offset) != offsets.end();
+    if (!isContained) {
+        offsets.push_back(offset);
+    }
     if (offsets.size() > MAX_OFFSETS_DATA_SIZE) {
         std::cout<<"[ERROR] the offsets is heap over flow ... "<<std::endl;
     }
@@ -180,4 +182,3 @@ void InstanceMeshDrawable::addOffset(const glm::vec3& offset) {
 BlockDataContent InstanceMeshDrawable::getBlockData() const {
     return this -> blockData;
 }
-

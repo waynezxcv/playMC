@@ -20,9 +20,7 @@ namespace GLL {
     
     
     class Window : public NonCopyable {
-        
     public:
-        
         std::function<void(std::shared_ptr<FrameBuffer>)> displayRunloopCallback;
         std::function<void(const int& width, const int& height)> framebufferSizeChangedCallback;
         std::function<void(const double &xPosition, const double &yPosition)> mouseMoveEventCallback;
@@ -43,13 +41,12 @@ namespace GLL {
         };
         
     private:
-        
         Window(){};
+        
         glm::vec3 backgroundColor;
         glm::vec2 currentFrameBufferSize{WINDOW_WIDTH, WINDOW_HEIGHT};
         GLFWwindow *glfwWindow;
         void keyboardEventHandle(GLFWwindow *window);
-        
        
     };
     

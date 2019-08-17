@@ -91,7 +91,7 @@ void TextRender::renderInit() {
     glBindVertexArray(0);
 }
 
-void TextRender::draw(Camera* camera, std::shared_ptr<FrameBuffer> frameBuffer) {
+void TextRender::draw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) {
     
     shader.use();
 

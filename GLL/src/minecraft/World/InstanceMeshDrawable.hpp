@@ -22,8 +22,8 @@ namespace GLL {
     public:
         InstanceMeshDrawable(const BlockDataContent& blockData ,const ChunkMesh::ChunkMeshFaceDirection& direction);
         ~InstanceMeshDrawable();
-        void addOffset(const glm::vec3& offset);
-        void instanceDraw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer);
+        void addOffsetIfNeeded(const glm::vec3& offset);
+        void instanceDraw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer);
         BlockDataContent getBlockData() const;
         
     private:
@@ -42,6 +42,18 @@ namespace GLL {
         void makeVertices(const std::vector<glm::vec3>& face, const std::vector<glm::vec2>& texCoords, const GLfloat& cardinalLight);
         void bufferData();
         void bufferInstanceSubData();
+    };
+}
+
+
+
+
+namespace GLL {
+    class InstanceMeshDrawableFactory {
+    public:
+        static std::unique_ptr<InstanceMeshDrawable> makeInstanceMeshDrawable(const BlockDataContent& blockData ,const ChunkMesh::ChunkMeshFaceDirection& direction) {
+            return std::make_unique<InstanceMeshDrawable>(blockData, direction);
+        }
     };
 }
 

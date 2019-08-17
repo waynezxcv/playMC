@@ -128,7 +128,8 @@ void SkyboxRender::renderInit() {
 }
 
 
-void SkyboxRender::draw(Camera *camera, std::shared_ptr<FrameBuffer> frameBuffer) {
+void SkyboxRender::draw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) {
+    
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     shader.use();

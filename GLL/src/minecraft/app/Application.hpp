@@ -11,14 +11,13 @@ namespace GLL {
     template <typename T>
     class Application : public NonCopyable {
     public:
-        Application(const CameraConfig& cameraConfig);
+        Application();
         ~Application();
         void start() ;
-        Camera* getCamera() const;
+        std::unique_ptr<T> makeAppDelegate();
         
     private:
-        T* render;
-        Camera *camera;
+        std::unique_ptr<T> appDelegate;
         void mouseMoveEventHandle(double xPosition, double yPosition);
         void mouseLeftButtonDragMoveEventHandle(double xPosition, double yPosition);
         void mouseRightButtonDragMoveEventHandle(double xPosition, double yPosition);
@@ -32,21 +31,29 @@ namespace GLL {
     
     /* ------------------------------------------ */
     template <typename T>
-    Application<T>::Application(const CameraConfig& cameraConfig) :
-    camera(new Camera(cameraConfig)),
-    render(nullptr) {
+    Application<T>::Application()
+    {
     };
     
     
     template <typename T>
     Application<T>::~Application() {
-        delete this->camera;
-        delete this->render;
     }
     
     
     template <typename T>
+    std::unique_ptr<T> Application<T>::makeAppDelegate() {
+        return std::make_unique<T>();
+    }
+    
+    template <typename T>
     void Application<T>::start() {
+        /*
+         确保appdelegate创建在window setup之后，否则会因OpenGL没有初始化完崩溃
+         */
+        GLL::Window::sharedInstance()->setup();
+        appDelegate = makeAppDelegate();
+        
         
         glm::vec3 color(0.3f, 0.5f, 0.5f);
         GLL::Window::sharedInstance()->setBackgroundColor(color);
@@ -79,31 +86,19 @@ namespace GLL {
             this -> framebufferSizeChangedHandle(widht, height);
         };
         
-        /*
-         确保render创建在window setup之后，否则会因OpenGL没有初始化完崩溃
-         */
-        GLL::Window::sharedInstance()->setup();
-        this -> render = new T();
-        this -> render -> setCamera(this -> camera);
         GLL::Window::sharedInstance()->runloop();
     }
     
     
     template <typename T>
-    Camera* Application<T>::getCamera() const {
-        return this->camera;
-    }
-    
-    
-    template <typename T>
     void Application<T>::mouseMoveEventHandle(double xPosition, double yPosition) {
-        this -> camera -> processMouseMovement(xPosition, -yPosition);
+        this -> appDelegate ->camera -> processMouseMovement(xPosition, -yPosition);
     }
     
     
     template <typename T>
     void Application<T>::mouseLeftButtonDragMoveEventHandle(double xPosition, double yPosition) {
-        this -> camera -> processMouseLeftButtonDragMovement(xPosition, -yPosition);
+        this -> appDelegate->camera -> processMouseLeftButtonDragMovement(xPosition, -yPosition);
     }
     
     
@@ -114,19 +109,19 @@ namespace GLL {
     
     template <typename T>
     void Application<T>::mouseScrollEventHandle(double xPosition, double yPosition) {
-        this -> camera -> processMouseScroll(yPosition);
+        this -> appDelegate->camera -> processMouseScroll(yPosition);
     }
     
     
     template <typename T>
     void Application<T>::keyboardTapEventHandle(WindowKeyboardEventType eventType, float deltaTime) {
-        this -> camera -> processKeyboard(cameraMovementFromKeyboardEventType(eventType), deltaTime);
+        this -> appDelegate->camera -> processKeyboard(cameraMovementFromKeyboardEventType(eventType), deltaTime);
     }
     
     template <typename T>
     void Application<T>::framebufferSizeChangedHandle(int width, int height) {
         FrameBufferCache::sharedInstance() -> clearAllCaches();
-        this -> camera -> processFrameBufferSizeChanged(width, height);
+        this -> appDelegate->camera -> processFrameBufferSizeChanged(width, height);
     }
     
     template <typename T>
@@ -144,7 +139,7 @@ namespace GLL {
     
     template <typename T>
     void Application<T>::displayRunloopHandle(std::shared_ptr<FrameBuffer> frameBuffer) {
-        render -> draw(this->camera, frameBuffer);
+        appDelegate -> draw(frameBuffer);
     }
     
 } // namespace GLL

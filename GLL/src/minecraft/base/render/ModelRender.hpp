@@ -20,7 +20,7 @@ namespace GLL {
         ~ModelRender();
         
         void renderInit() override;
-        void draw(Camera* camera,  std::shared_ptr<FrameBuffer> frameBuffer) override;
+        void draw(std::shared_ptr<Camera> camera,  std::shared_ptr<FrameBuffer> frameBuffer) override;
         
         glm::vec3 lightPosition;
         glm::vec3 lightDirection;

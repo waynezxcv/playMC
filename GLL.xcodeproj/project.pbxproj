@@ -543,7 +543,6 @@
 		0142ADED22E47DC4008FB3E4 /* TerrainGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TerrainGenerator.hpp; sourceTree = "<group>"; };
 		01455A1722FEF1C800DC9EA4 /* VectorXYZ.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VectorXYZ.cpp; sourceTree = "<group>"; };
 		01455A1822FEF1C800DC9EA4 /* VectorXYZ.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = VectorXYZ.hpp; sourceTree = "<group>"; };
-		01455A1B22FF1C0900DC9EA4 /* InstanceMeshCollection.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = InstanceMeshCollection.hpp; sourceTree = "<group>"; };
 		01476C6D22D25F43000DDC15 /* InstanceRender.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = InstanceRender.cpp; sourceTree = "<group>"; };
 		01476C6E22D25F43000DDC15 /* InstanceRender.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = InstanceRender.hpp; sourceTree = "<group>"; };
 		01476C7522D26132000DDC15 /* planet_Quom1200.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = planet_Quom1200.png; sourceTree = "<group>"; };
@@ -745,7 +744,6 @@
 			children = (
 				019DAB2722DA3DED000CD15E /* World.hpp */,
 				019DAB2622DA3DED000CD15E /* World.cpp */,
-				01455A1B22FF1C0900DC9EA4 /* InstanceMeshCollection.hpp */,
 				0149DAB222E6394D000C3B6C /* InstanceMeshDrawable.hpp */,
 				0149DAB122E6394D000C3B6C /* InstanceMeshDrawable.cpp */,
 				01DD4E4022F66E1A000DC5CF /* WorkersManager.hpp */,
