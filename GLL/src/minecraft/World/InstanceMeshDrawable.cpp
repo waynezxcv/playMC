@@ -117,17 +117,18 @@ void InstanceMeshDrawable::bufferData() {
     glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void *) (0));
     glVertexAttribDivisor(4, 1);
     glBindVertexArray(0);
+    
+    std::cout<<">> buffered data for instance :[ " << this -> blockData.blockId<<this->direction<<" ]"<<std::endl;
 }
 
 void InstanceMeshDrawable::bufferInstanceSubData() {
-    if (instanceVBO == 0) {
-        return;
-    }
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
     this -> offsetsMutex.lock();
     glBufferSubData(GL_ARRAY_BUFFER, currentBuffredOffsetsCount * sizeof(glm::vec3), (offsets.size() - currentBuffredOffsetsCount) * sizeof(glm::vec3), &offsets[currentBuffredOffsetsCount]);
     currentBuffredOffsetsCount = offsets.size();
     this -> offsetsMutex.unlock();
+    std::cout<<">> buffered instance sub data for instance : [ " << this -> blockData.blockId<<this->direction<<" ]" <<"current offsets size :"<<currentBuffredOffsetsCount<<std::endl;
+    
 }
 
 void InstanceMeshDrawable::makeVertices(const std::vector<glm::vec3>& face, const std::vector<glm::vec2>& texCoords, const GLfloat& cardinalLight) {
@@ -141,11 +142,14 @@ void InstanceMeshDrawable::makeVertices(const std::vector<glm::vec3>& face, cons
     }
 }
 
+
 void InstanceMeshDrawable::instanceDraw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) {
+    
     if (dataBuffered == false) {
         bufferData();
         dataBuffered = true;
     }
+    
     this -> offsetsMutex.lock();
     GLint offsetsSzie = (GLint)offsets.size();
     this -> offsetsMutex.unlock();
@@ -167,18 +171,29 @@ void InstanceMeshDrawable::instanceDraw(std::shared_ptr<Camera> camera, std::sha
     TextureAtlas::sharedInstance().unbindTexture();
 }
 
-void InstanceMeshDrawable::addOffsetIfNeeded(const glm::vec3& offset) {
+bool InstanceMeshDrawable::addOffsetIfNeeded(const glm::vec3& offset) {
     this -> offsetsMutex.lock();
-    bool isContained = std::find(offsets.begin(), offsets.end(), offset) != offsets.end();
-    if (!isContained) {
+    bool result = false;
+    if (std::find(offsets.begin(), offsets.end(), offset) == offsets.end()) {
         offsets.push_back(offset);
+        result = true;
     }
     if (offsets.size() > MAX_OFFSETS_DATA_SIZE) {
         std::cout<<"[ERROR] the offsets is heap over flow ... "<<std::endl;
     }
     this -> offsetsMutex.unlock();
+    return result;
 }
+
 
 BlockDataContent InstanceMeshDrawable::getBlockData() const {
     return this -> blockData;
+}
+
+
+int InstanceMeshDrawable::getCurrentOffsetSize() const {
+    this -> offsetsMutex.lock();
+    auto count = this -> offsets.size();
+    this -> offsetsMutex.unlock();
+    return count;
 }

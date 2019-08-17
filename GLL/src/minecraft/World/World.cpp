@@ -23,7 +23,6 @@ World::~World() {
 }
 
 void World::draw(std::shared_ptr<FrameBuffer> frameBuffer) {
-    
     if (this -> camera == nullptr) {
         return;
     }
@@ -45,13 +44,15 @@ void World::draw(std::shared_ptr<FrameBuffer> frameBuffer) {
 
 
 void World::setupMeshInstances() {
+    
+    // 以chunk为单位进行绘制
     chunkManager.traviesingChunks([this](std::shared_ptr<Chunk> chunk) -> void {
         bool isMeshMade = chunk -> makeMeshIfNeeded();
         if (!isMeshMade) {
             return;
         }
-        
         auto map = chunk -> getDrawableMap();
+        
         for (auto one : map) {
             BlockShaderType shaderType =  one.second -> getBlockData().shaderType;
             if (shaderType == BlockShaderType_Chunck) {
@@ -78,6 +79,7 @@ ChunkManager& World::getChunkManager() {
 #pragma mark - Load & Render
 
 void World::setSpawnPoint() {
+    
     double start = glfwGetTime();
     std::cout << "Searching for spawn...\n";
     
@@ -120,45 +122,37 @@ void World::loadChunks(std::shared_ptr<Camera> camera) {
     glm::vec3 cameraPosiiton = camera -> getCameraPosition();
     
     inflightWorker -> enqueue([this, cameraPosiiton]() {
-        
-        //        for (int x = 0; x < 1; ++x) {
-        //            for (int z = 0; z < 1; ++z) {
-        //                std::lock_guard<std::mutex> lock(this -> mainMutex);
-        //                chunkManager.loadChunk(x, z);
-        //            }
-        //        }
-        //
-        
+
         bool isChunkLoaded = false;
         int cameraX = cameraPosiiton.x / CHUNK_SIZE;
         int cameraZ = cameraPosiiton.z / CHUNK_SIZE;
-        
+
         for (int i = 0; i < loadDistance; i++) {
-            
+
             int minX = std::max(cameraX  - i, 0);
             int minZ = std::max(cameraZ  - i, 0);
-            
+
             int maxX = cameraX + i;
             int maxZ = cameraZ + i;
-            
+
             for (int x = minX; x < maxX; ++x) {
                 for (int z = minZ; z < maxZ; ++z) {
                     std::lock_guard<std::mutex> lock(this -> mainMutex);
                     isChunkLoaded = chunkManager.loadChunk(x, z);
                 }
             }
-            
+
             // 如果这个distance内的chunk已经load，则进入下次循环
             if (isChunkLoaded) {
                 break;
             }
         }
-        
+
         if (!isChunkLoaded) {
             loadDistance ++;
         }
-        
-        
+
+
         if (loadDistance >= RENDER_DISTANCE) {
             loadDistance = 2;
         }

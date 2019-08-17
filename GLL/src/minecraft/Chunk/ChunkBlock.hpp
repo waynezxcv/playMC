@@ -12,14 +12,11 @@ namespace GLL {
     public:
         InstanceMesh() {};
         ~InstanceMesh() {};
-        
         BlockDataContent blockData;
         ChunkMesh::ChunkMeshFaceDirection direction;
         glm::vec3 offset;
     };
-
 }
-
 
 namespace GLL {
     class ChunkSection;

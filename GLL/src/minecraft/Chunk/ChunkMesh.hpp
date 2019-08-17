@@ -86,7 +86,6 @@ namespace GLL {
     constexpr GLfloat LIGHT_BOT = 0.4f;
     
     
-    
     class ChunkMesh {
     public:
         typedef enum : int {

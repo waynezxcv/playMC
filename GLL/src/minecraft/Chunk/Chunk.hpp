@@ -68,6 +68,8 @@ namespace GLL {
         std::unordered_map<VectorXZ, int> highestBlocks;
         std::map<std::string, std::shared_ptr<InstanceMeshDrawable>> drawablesMap;
         
+        std::atomic<int> offsetDataCount {0};
+        
     private:
         bool isOutOfBouds(const int index);
         void load(WorldMapGenerator& generator);

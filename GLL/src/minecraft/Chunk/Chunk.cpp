@@ -130,9 +130,9 @@ bool Chunk::makeMeshIfNeeded() {
             this -> internalMakeMeshes(block);
         });
     });
+
     return true;
 }
-
 
 void Chunk::internalMakeMeshes(std::shared_ptr<ChunkBlock> block) {
     std::vector<std::shared_ptr<InstanceMesh>> meshes = this -> makeMeshesWithBlock(block);
@@ -145,15 +145,19 @@ void Chunk::internalMakeMeshes(std::shared_ptr<ChunkBlock> block) {
             this -> drawablesMap.insert(pair);
         }
         std::shared_ptr<InstanceMeshDrawable> drawable = this -> drawablesMap[key];
-        drawable -> addOffsetIfNeeded(mesh -> offset);
+        bool ret = drawable -> addOffsetIfNeeded(mesh -> offset);
+        if (ret) {
+            offsetDataCount ++;
+        }
     }
 }
 
-
 std::map<std::string, std::shared_ptr<InstanceMeshDrawable>>& Chunk::getDrawableMap() {
+    std::cout<<">> made drawable count :" << this -> drawablesMap.size() <<std::endl;
+    std::cout<<">> made total offset count :" << this -> offsetDataCount <<std::endl;
+    std::cout<<">> ----------------------------------------" <<std::endl;
     return this -> drawablesMap;
 }
-
 
 /*
  mesh表示一个block一个面的相关数据

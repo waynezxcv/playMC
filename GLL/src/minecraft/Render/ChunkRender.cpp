@@ -21,13 +21,15 @@ void ChunkRender::addDrawableIfNeeded(std::pair<std::string, std::shared_ptr<Ins
     if (!found) {
         this -> instanceMeshes.insert(pair);
     }
+    else {
+        std::cout<<">> the ["<<pair.first<<"] has already exsited, current offsets count : ["<<pair.second->getCurrentOffsetSize()<<"]"<<std::endl;
+        
+    }
 }
-
 
 void ChunkRender::clear() {
     this -> instanceMeshes.clear();
 }
-
 
 void ChunkRender::draw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) {
     if (this -> instanceMeshes.empty()) {
@@ -46,7 +48,7 @@ void ChunkRender::draw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuff
     shader.setUniformMatrix4("view", camera -> getViewMatrix());
     shader.setUniformFloat("globalTime",(float)glfwGetTime());
     
-    for (auto& one : instanceMeshes) {
+    for (auto one : instanceMeshes) {
         one.second -> instanceDraw(camera, frameBuffer);
     }
     
