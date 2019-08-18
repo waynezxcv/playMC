@@ -53,8 +53,8 @@ void ChunkSection::travesingBlocks(std::function<void(std::shared_ptr<ChunkBlock
     for (int x = 0; x < CHUNK_SIZE; x ++) {
         for (int y = 0; y < CHUNK_SIZE; y ++) {
             for (int z = 0; z < CHUNK_SIZE; z ++) {
-                
                 std::shared_ptr<ChunkBlock> block = this -> blockArray[x][y][z];
+#if CUSTOM_CULL_FACE_ENABLED
                 if (x > 0 && blockArray[x - 1][y][z] != nullptr) {
                     block->leftBlockId = blockArray[x - 1][y][z] -> getBlockData().blockId;
                 }
@@ -77,7 +77,7 @@ void ChunkSection::travesingBlocks(std::function<void(std::shared_ptr<ChunkBlock
                 if(z < CHUNK_SIZE - 1 &&blockArray[x][y][z + 1] != nullptr) /* Face Z+ */ {
                     block -> frontBlockId = blockArray[x][y][z + 1] -> getBlockData().blockId;
                 }
-                
+#endif
                 if (callback) {
                     callback(block);
                 }
@@ -85,7 +85,6 @@ void ChunkSection::travesingBlocks(std::function<void(std::shared_ptr<ChunkBlock
         }
     }
 }
-
 
 void ChunkSection::setBlock(const BlockId& blockId,const int& x, const int& y, const int& z) {
     if (isOutOfBounds(x, y, z)) {

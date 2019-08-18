@@ -44,29 +44,12 @@ void World::draw(std::shared_ptr<FrameBuffer> frameBuffer) {
 
 
 void World::setupMeshInstances() {
-    
     // 以chunk为单位进行绘制
     chunkManager.traviesingChunks([this](std::shared_ptr<Chunk> chunk) -> void {
-        bool isMeshMade = chunk -> makeMeshIfNeeded();
-        if (!isMeshMade) {
-            return;
-        }
-        auto map = chunk -> getDrawableMap();
-        
-        for (auto one : map) {
-            BlockShaderType shaderType =  one.second -> getBlockData().shaderType;
-            if (shaderType == BlockShaderType_Chunck) {
-                masterRender.chunkRender.addDrawableIfNeeded(one);
-            }
-            else if (shaderType == BlockShaderType_Liquid) {
-                masterRender.liquidRender.addDrawableIfNeeded(one);
-            }
-            else if (shaderType == BlockShaderType_Flora) {
-                masterRender.floraRender.addDrawableIfNeeded(one);
-            }
-        }
+        chunk -> makeMeshIfNeeded(masterRender);
     });
 }
+
 
 MasterRender& World::getMasterRender() {
     return this -> masterRender;
@@ -122,7 +105,7 @@ void World::loadChunks(std::shared_ptr<Camera> camera) {
     glm::vec3 cameraPosiiton = camera -> getCameraPosition();
     
     inflightWorker -> enqueue([this, cameraPosiiton]() {
-
+        
         bool isChunkLoaded = false;
         int cameraX = cameraPosiiton.x / CHUNK_SIZE;
         int cameraZ = cameraPosiiton.z / CHUNK_SIZE;

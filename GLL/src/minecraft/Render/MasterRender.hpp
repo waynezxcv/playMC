@@ -29,6 +29,13 @@ namespace GLL {
         ~MasterRender();
         void draw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) override;
         
+        
+        std::shared_ptr<InstanceMeshDrawable> getInstanceMeshDrawable(const std::string& key);
+        void insertInstanceMeshDrawableIfNeeded(std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>> pair);
+        void clear();
+        
+        
+
         ChunkRender chunkRender;
         ChunkRender liquidRender;
         ChunkRender floraRender;
@@ -40,6 +47,8 @@ namespace GLL {
     private:
         SkyboxRender skyboxRender;
         World* world;
+        std::map<std::string, std::shared_ptr<InstanceMeshDrawable>> instanceMeshes;
+
     private:
         void renderInit() override;
         void drawSubRenders(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer);

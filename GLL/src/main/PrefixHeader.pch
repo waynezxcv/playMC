@@ -15,10 +15,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#define CUSTOM_CULL_FACE_ENABLED (0)
+
+#define CUSTOM_CULL_FACE_ENABLED (1)
 #define GL_CULL_FACE_ENABLED (1)
-#define POLYGON_LINE_ENAGLED (0)
 #define AABB_TEST_ENABLED (1)
+
+
+#define POLYGON_LINE_ENAGLED (0)
 #define TEXT_RENDER_ENABLED (0)
 
 #endif /* PrefixHeader_pch */

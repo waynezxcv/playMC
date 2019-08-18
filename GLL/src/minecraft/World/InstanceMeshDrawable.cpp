@@ -107,28 +107,28 @@ void InstanceMeshDrawable::bufferData() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * MAX_OFFSETS_DATA_SIZE, NULL, GL_STATIC_DRAW);
     
     this -> offsetsMutex.lock();
-    GLint offsetsSzie = (GLint)offsets.size();
+    GLint offsetsSize = (GLint)offsets.size();
     this -> offsetsMutex.unlock();
     
-    if (currentBuffredOffsetsCount != offsetsSzie) {
+    if (this -> currentBuffredOffsetsCount != offsetsSize) {
         this -> bufferInstanceSubData();
     }
+    
     glEnableVertexAttribArray(4);
     glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void *) (0));
     glVertexAttribDivisor(4, 1);
     glBindVertexArray(0);
-    
-    std::cout<<">> buffered data for instance :[ " << this -> blockData.blockId<<this->direction<<" ]"<<std::endl;
 }
 
+
 void InstanceMeshDrawable::bufferInstanceSubData() {
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
     this -> offsetsMutex.lock();
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+//    std::cout<<">> before buffer subdata : [ " << this -> blockData.blockId<<this->direction<<" ] " <<"currentBuffredOffsetsCount : ["<<currentBuffredOffsetsCount<<"], offsets.size() : ["<<offsets.size()<<"]"<<std::endl;
     glBufferSubData(GL_ARRAY_BUFFER, currentBuffredOffsetsCount * sizeof(glm::vec3), (offsets.size() - currentBuffredOffsetsCount) * sizeof(glm::vec3), &offsets[currentBuffredOffsetsCount]);
     currentBuffredOffsetsCount = offsets.size();
+//    std::cout<<">> after buffer subdata : [ " << this -> blockData.blockId<<this->direction<<" ] " <<"currentBuffredOffsetsCount : ["<<currentBuffredOffsetsCount<<"], offsets.size() : ["<<offsets.size()<<"]"<<std::endl;
     this -> offsetsMutex.unlock();
-    std::cout<<">> buffered instance sub data for instance : [ " << this -> blockData.blockId<<this->direction<<" ]" <<"current offsets size :"<<currentBuffredOffsetsCount<<std::endl;
-    
 }
 
 void InstanceMeshDrawable::makeVertices(const std::vector<glm::vec3>& face, const std::vector<glm::vec2>& texCoords, const GLfloat& cardinalLight) {
@@ -142,7 +142,6 @@ void InstanceMeshDrawable::makeVertices(const std::vector<glm::vec3>& face, cons
     }
 }
 
-
 void InstanceMeshDrawable::instanceDraw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) {
     
     if (dataBuffered == false) {
@@ -151,10 +150,10 @@ void InstanceMeshDrawable::instanceDraw(std::shared_ptr<Camera> camera, std::sha
     }
     
     this -> offsetsMutex.lock();
-    GLint offsetsSzie = (GLint)offsets.size();
+    GLint offsetsSize = (GLint)offsets.size();
     this -> offsetsMutex.unlock();
     
-    if (currentBuffredOffsetsCount != offsetsSzie) {
+    if (this -> currentBuffredOffsetsCount != offsetsSize) {
         this -> bufferInstanceSubData();
     }
     
@@ -163,7 +162,7 @@ void InstanceMeshDrawable::instanceDraw(std::shared_ptr<Camera> camera, std::sha
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
     glBindVertexArray(VAO);
-    glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0, (int)offsetsSzie);
+    glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0, (int)offsetsSize);
     glBindVertexArray(0);
 #if POLYGON_LINE_ENAGLED
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -172,19 +171,43 @@ void InstanceMeshDrawable::instanceDraw(std::shared_ptr<Camera> camera, std::sha
 }
 
 bool InstanceMeshDrawable::addOffsetIfNeeded(const glm::vec3& offset) {
+    
     this -> offsetsMutex.lock();
     bool result = false;
     if (std::find(offsets.begin(), offsets.end(), offset) == offsets.end()) {
         offsets.push_back(offset);
         result = true;
     }
+    
     if (offsets.size() > MAX_OFFSETS_DATA_SIZE) {
         std::cout<<"[ERROR] the offsets is heap over flow ... "<<std::endl;
     }
+    
     this -> offsetsMutex.unlock();
+    
     return result;
 }
 
+
+bool InstanceMeshDrawable::addOffsetIfNeeded(const std::vector<glm::vec3>& rhs) {
+    
+    this -> offsetsMutex.lock();
+    bool result = false;
+    
+    for (auto offset : rhs) {
+        if (std::find(offsets.begin(), offsets.end(), offset) == offsets.end()) {
+            offsets.push_back(offset);
+            result = true;
+        }
+    }
+    
+    if (offsets.size() > MAX_OFFSETS_DATA_SIZE) {
+        std::cout<<"[ERROR] the offsets is heap over flow ... "<<std::endl;
+    }
+    
+    this -> offsetsMutex.unlock();
+    return result;
+}
 
 BlockDataContent InstanceMeshDrawable::getBlockData() const {
     return this -> blockData;
@@ -195,5 +218,13 @@ int InstanceMeshDrawable::getCurrentOffsetSize() const {
     this -> offsetsMutex.lock();
     auto count = this -> offsets.size();
     this -> offsetsMutex.unlock();
-    return count;
+    return (int)count;
+}
+
+
+std::vector<glm::vec3> InstanceMeshDrawable::getOffsets() const {
+    this -> offsetsMutex.lock();
+    std::vector<glm::vec3> ret(this -> offsets);
+    this -> offsetsMutex.unlock();
+    return ret;
 }

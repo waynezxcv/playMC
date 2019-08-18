@@ -2,6 +2,9 @@
 #include "Chunk.hpp"
 #include "Camera.hpp"
 #include "InstanceMeshDrawable.hpp"
+#include "MasterRender.hpp"
+
+
 
 using namespace GLL;
 
@@ -38,7 +41,6 @@ void Chunk::setBlock(const BlockId& blockId, GLfloat x,  GLfloat y, GLfloat z) {
     this -> sectionMapMutex.unlock();
     this -> updateHighestBlocks(x, y, z);
 }
-
 
 std::shared_ptr<ChunkBlock> Chunk::getBlock(int x, int y, int z)  {
     // 根据世界坐标y找到对应的index值
@@ -119,45 +121,66 @@ int Chunk::getHeightAt(int x, int z) const {
     return highestBlocks.at(key);
 }
 
-bool Chunk::makeMeshIfNeeded() {
+bool Chunk::makeMeshIfNeeded(MasterRender& masterRender) {
     if (this -> isNeedUpdateMesh == false) {
         return false;
     }
     this -> isNeedUpdateMesh = false;
+    
     std::cout<<">> start make mesh at for chunk :" << this -> getLocation().x << " , "<< this -> getLocation().y<<std::endl;
-    this -> traversingSections([this](std::shared_ptr<ChunkSection> section) -> void {
-        section -> travesingBlocks([this](std::shared_ptr<ChunkBlock> block) -> void {
-            this -> internalMakeMeshes(block);
+    this -> traversingSections([this, &masterRender](std::shared_ptr<ChunkSection> section) -> void {
+        section -> travesingBlocks([this, &masterRender](std::shared_ptr<ChunkBlock> block) mutable -> void {
+            this -> internalMakeMeshes(block, masterRender);
         });
     });
-
     return true;
 }
 
-void Chunk::internalMakeMeshes(std::shared_ptr<ChunkBlock> block) {
+/*
+ add 频率太高，需要一次性buffer个。。
+ 需要一个collection来装载所有instanceDrawable
+ */
+void Chunk::internalMakeMeshes(std::shared_ptr<ChunkBlock> block, MasterRender& masterRender) {
+    
     std::vector<std::shared_ptr<InstanceMesh>> meshes = this -> makeMeshesWithBlock(block);
+    std::map<std::string, std::vector<glm::vec3>> tmpMap;
+    
     for (auto mesh : meshes) {
+        
         std::string key = this -> hashWithInstanceMesh(mesh);
-        bool found = this -> drawablesMap.find(key) != this -> drawablesMap.end();
-        if (!found) {
-            std::shared_ptr<InstanceMeshDrawable> drawable = std::make_shared<InstanceMeshDrawable>(mesh -> blockData, mesh -> direction);
+        std::shared_ptr<InstanceMeshDrawable> drawable = masterRender.getInstanceMeshDrawable(key);
+        
+        // setup drawable if needed
+        if (drawable == nullptr) {
+            drawable = std::make_shared<InstanceMeshDrawable>(mesh -> blockData, mesh -> direction);
             std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>> pair(key, drawable);
-            this -> drawablesMap.insert(pair);
+            masterRender.insertInstanceMeshDrawableIfNeeded(pair);
         }
-        std::shared_ptr<InstanceMeshDrawable> drawable = this -> drawablesMap[key];
-        bool ret = drawable -> addOffsetIfNeeded(mesh -> offset);
-        if (ret) {
-            offsetDataCount ++;
+        
+        // setup tmp offsets
+        bool found = tmpMap.find(key) != tmpMap.end();
+        if (found) {
+            std::vector<glm::vec3> tmpOffsets = tmpMap[key];
+            tmpOffsets.push_back(mesh -> offset);
+        }
+        else {
+            std::vector<glm::vec3> tmpOffsets;
+            tmpOffsets.push_back(mesh -> offset);
+            std::pair<std::string, std::vector<glm::vec3>> pair(key, tmpOffsets);
+            tmpMap.insert(pair);
+        }
+    }
+    
+    for (auto one : tmpMap) {
+        std::string key = one.first;
+        std::vector<glm::vec3> offsets = one.second;
+        std::shared_ptr<InstanceMeshDrawable> drawable = masterRender.getInstanceMeshDrawable(key);
+        if (drawable != nullptr) {
+            drawable -> addOffsetIfNeeded(offsets);
         }
     }
 }
 
-std::map<std::string, std::shared_ptr<InstanceMeshDrawable>>& Chunk::getDrawableMap() {
-    std::cout<<">> made drawable count :" << this -> drawablesMap.size() <<std::endl;
-    std::cout<<">> made total offset count :" << this -> offsetDataCount <<std::endl;
-    std::cout<<">> ----------------------------------------" <<std::endl;
-    return this -> drawablesMap;
-}
 
 /*
  mesh表示一个block一个面的相关数据
@@ -246,7 +269,6 @@ std::vector<std::shared_ptr<InstanceMesh>> Chunk::makeMeshesWithBlock(std::share
     }
     return meshes;
 }
-
 
 std::string Chunk::hashWithInstanceMesh(std::shared_ptr<InstanceMesh> mesh) {
     return std::to_string(mesh -> blockData.blockId) + std::to_string(mesh -> direction);

@@ -24,24 +24,31 @@ namespace GLL {
         ~InstanceMeshDrawable();
         
         bool addOffsetIfNeeded(const glm::vec3& offset);
+        bool addOffsetIfNeeded(const std::vector<glm::vec3>& offsets);
+
+        
+        
         void instanceDraw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer);
         BlockDataContent getBlockData() const;
         
         int getCurrentOffsetSize() const;
+        std::vector<glm::vec3> getOffsets() const;
         
     private:
         GLuint VAO, VBO, EBO = 0;
         GLuint instanceVBO = 0;
         
-        
         std::atomic<bool> dataBuffered;
         std::atomic<long> currentBuffredOffsetsCount;
+
         mutable std::recursive_mutex offsetsMutex;
 
         std::vector<glm::vec3> offsets;
         BlockDataContent blockData;
         ChunkMesh::ChunkMeshFaceDirection direction;
         std::vector<ChunkMesh::ChunkMeshVertex> vertices;
+        
+        
         
     private:
         void makeVertices(const std::vector<glm::vec3>& face, const std::vector<glm::vec2>& texCoords, const GLfloat& cardinalLight);
