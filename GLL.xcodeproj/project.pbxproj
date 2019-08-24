@@ -744,10 +744,6 @@
 			children = (
 				019DAB2722DA3DED000CD15E /* World.hpp */,
 				019DAB2622DA3DED000CD15E /* World.cpp */,
-				0149DAB222E6394D000C3B6C /* InstanceMeshDrawable.hpp */,
-				0149DAB122E6394D000C3B6C /* InstanceMeshDrawable.cpp */,
-				01DD4E4022F66E1A000DC5CF /* WorkersManager.hpp */,
-				01DD4E3F22F66E1A000DC5CF /* WorkersManager.cpp */,
 			);
 			path = World;
 			sourceTree = "<group>";
@@ -755,6 +751,8 @@
 		0132A28422E0BF3C00385779 /* Chunk */ = {
 			isa = PBXGroup;
 			children = (
+				0149DAB222E6394D000C3B6C /* InstanceMeshDrawable.hpp */,
+				0149DAB122E6394D000C3B6C /* InstanceMeshDrawable.cpp */,
 				019A8B9222E0EAEF0073D2E8 /* ChunkDefine.hpp */,
 				01096D5722EC858E00988D18 /* VectorXZ.hpp */,
 				01096D5622EC858E00988D18 /* VectorXZ.cpp */,
@@ -1360,6 +1358,8 @@
 		0154D93322C152EB000D6755 /* commons */ = {
 			isa = PBXGroup;
 			children = (
+				01DD4E4022F66E1A000DC5CF /* WorkersManager.hpp */,
+				01DD4E3F22F66E1A000DC5CF /* WorkersManager.cpp */,
 				017E803A22EF3F1400D025CD /* Worker.hpp */,
 				010E872822E4B32D00455494 /* Array2D.hpp */,
 				0101F76822F54A60004C5381 /* RandomSingleton.hpp */,

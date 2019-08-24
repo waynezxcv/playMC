@@ -19,7 +19,7 @@ void FPSCounter::update() {
         this -> fps = frameCount / delta;
         frameCount = 0;
         this -> lastTime = current;
-        std::cout<<"[current fps] : " <<this -> fps <<std::endl;
+        std::cout<<"[fps] : " <<this -> fps <<std::endl;
     }
 }
 

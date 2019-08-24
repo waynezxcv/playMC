@@ -5,7 +5,6 @@
 #include "MasterRender.hpp"
 
 
-
 using namespace GLL;
 
 
@@ -29,11 +28,12 @@ void Chunk::setupSectionIfNeeded(int index) {
 }
 
 void Chunk::setBlock(const BlockId& blockId, GLfloat x,  GLfloat y, GLfloat z) {
-    // 根据世界坐标y找到对应的index值
+    
     GLuint sectionIndex = y / CHUNK_SIZE;
     if (isOutOfBouds(sectionIndex) ) {
         return;
     }
+    
     this -> sectionMapMutex.lock();
     this -> setupSectionIfNeeded(sectionIndex);
     int bY = (int)y % (int)CHUNK_SIZE;
@@ -41,6 +41,7 @@ void Chunk::setBlock(const BlockId& blockId, GLfloat x,  GLfloat y, GLfloat z) {
     this -> sectionMapMutex.unlock();
     this -> updateHighestBlocks(x, y, z);
 }
+
 
 std::shared_ptr<ChunkBlock> Chunk::getBlock(int x, int y, int z)  {
     // 根据世界坐标y找到对应的index值
@@ -58,9 +59,11 @@ std::shared_ptr<ChunkBlock> Chunk::getBlock(int x, int y, int z)  {
 void Chunk::updateHighestBlocks(int x, int y, int z) {
     std::lock_guard<std::mutex> lock(this -> highesetBlocksMutex);
     VectorXZ key {x,z};
+    
     if (highestBlocks.find(key) == highestBlocks.end()) {
         highestBlocks.emplace(key,std::move(0));
     }
+    
     if (y == highestBlocks.at(key)) {
         auto highBlock = getBlock(x, y, z);
         while (highBlock != nullptr && ! highBlock -> getBlockData().isOpaque) {
@@ -72,6 +75,15 @@ void Chunk::updateHighestBlocks(int x, int y, int z) {
     }
 }
 
+int Chunk::getHeightAt(int x, int z) const {
+    std::lock_guard<std::mutex> lock(this -> highesetBlocksMutex);
+    VectorXZ key {x,z};
+    bool found = this->highestBlocks.find(key) != this -> highestBlocks.end();
+    if (!found) {
+        return 0;
+    }
+    return highestBlocks.at(key);
+}
 
 bool Chunk::isOutOfBouds(const int index) {
     if (index < 0 || index >= CHUNK_SIZE) {
@@ -111,86 +123,69 @@ glm::vec2 Chunk::getLocation() const {
     return location;
 }
 
-int Chunk::getHeightAt(int x, int z) const {
-    std::lock_guard<std::mutex> lock(this -> highesetBlocksMutex);
-    VectorXZ key {x,z};
-    bool found = this->highestBlocks.find(key) != this -> highestBlocks.end();
-    if (!found) {
-        return 0;
-    }
-    return highestBlocks.at(key);
-}
+
 
 bool Chunk::makeMeshIfNeeded(MasterRender& masterRender) {
+    
+    if (this -> hasLoaded == false) {
+        return false;
+    }
+    
     if (this -> isNeedUpdateMesh == false) {
         return false;
     }
-    this -> isNeedUpdateMesh = false;
     
-    std::cout<<">> start make mesh at for chunk :" << this -> getLocation().x << " , "<< this -> getLocation().y<<std::endl;
-    this -> traversingSections([this, &masterRender](std::shared_ptr<ChunkSection> section) -> void {
-        section -> travesingBlocks([this, &masterRender](std::shared_ptr<ChunkBlock> block) mutable -> void {
-            this -> internalMakeMeshes(block, masterRender);
+    this -> isNeedUpdateMesh = false;
+    double startTime = glfwGetTime();
+    
+    std::map<std::string, std::vector<glm::vec3>> currentTmpMap;
+    this -> traversingSections([&](std::shared_ptr<ChunkSection> section) -> void {
+        section -> travesingBlocks([&](std::shared_ptr<ChunkBlock> block) -> void {
+            std::vector<std::shared_ptr<InstanceMesh>> meshes = this -> makeMeshesWithBlock(block);
+            for (auto mesh : meshes) {
+                std::string key = this -> hashWithInstanceMesh(mesh);
+                std::shared_ptr<InstanceMeshDrawable> drawable = masterRender.getInstanceMeshDrawable(key);
+                // create drawable if needed
+                if (drawable == nullptr) {
+                    drawable = std::make_shared<InstanceMeshDrawable>(mesh -> blockData, mesh -> direction);
+                    std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>> pair(key, drawable);
+                    masterRender.insertInstanceMeshDrawableIfNeeded(std::move(pair));
+                }
+                if (currentTmpMap.find(key) != currentTmpMap.end()) {
+                    currentTmpMap[key].emplace_back(std::move(mesh -> offset));
+                }
+                else {
+                    std::vector<glm::vec3> offsets {mesh -> offset};
+                    std::pair<std::string, std::vector<glm::vec3>> pair(key, offsets);
+                    currentTmpMap.emplace(std::move(pair));
+                }
+            }
         });
     });
-    return true;
-}
-
-/*
- add 频率太高，需要一次性buffer个。。
- 需要一个collection来装载所有instanceDrawable
- */
-void Chunk::internalMakeMeshes(std::shared_ptr<ChunkBlock> block, MasterRender& masterRender) {
     
-    std::vector<std::shared_ptr<InstanceMesh>> meshes = this -> makeMeshesWithBlock(block);
-    std::map<std::string, std::vector<glm::vec3>> tmpMap;
-    
-    for (auto mesh : meshes) {
-        
-        std::string key = this -> hashWithInstanceMesh(mesh);
-        std::shared_ptr<InstanceMeshDrawable> drawable = masterRender.getInstanceMeshDrawable(key);
-        
-        // setup drawable if needed
-        if (drawable == nullptr) {
-            drawable = std::make_shared<InstanceMeshDrawable>(mesh -> blockData, mesh -> direction);
-            std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>> pair(key, drawable);
-            masterRender.insertInstanceMeshDrawableIfNeeded(pair);
-        }
-        
-        // setup tmp offsets
-        bool found = tmpMap.find(key) != tmpMap.end();
-        if (found) {
-            std::vector<glm::vec3> tmpOffsets = tmpMap[key];
-            tmpOffsets.push_back(mesh -> offset);
-        }
-        else {
-            std::vector<glm::vec3> tmpOffsets;
-            tmpOffsets.push_back(mesh -> offset);
-            std::pair<std::string, std::vector<glm::vec3>> pair(key, tmpOffsets);
-            tmpMap.insert(pair);
-        }
-    }
-    
-    for (auto one : tmpMap) {
+    startTime = glfwGetTime();
+    for (auto& one : currentTmpMap) {
         std::string key = one.first;
         std::vector<glm::vec3> offsets = one.second;
         std::shared_ptr<InstanceMeshDrawable> drawable = masterRender.getInstanceMeshDrawable(key);
         if (drawable != nullptr) {
-            drawable -> addOffsetIfNeeded(offsets);
+            drawable -> addMeshOffsets(std::move(offsets));
         }
     }
+    return true;
 }
-
 
 /*
  mesh表示一个block一个面的相关数据
  */
 std::vector<std::shared_ptr<InstanceMesh>> Chunk::makeMeshesWithBlock(std::shared_ptr<ChunkBlock>block) {
+    
     std::vector<std::shared_ptr<InstanceMesh>> meshes;
     BlockDataContent blockData = block -> getBlockData();
     if (blockData.blockId == BlockId_Air) {
         return meshes;
     }
+    
     // 立方体
     if (blockData.meshType == BlockMeshType_Cube) {
         /*
@@ -253,8 +248,10 @@ std::vector<std::shared_ptr<InstanceMesh>> Chunk::makeMeshesWithBlock(std::share
             meshes.push_back(mesh);
         }
     }
+    
     // X形不剔除了，都要显示
     else if (blockData.meshType == BlockMeshType_X) {
+        
         std::shared_ptr<InstanceMesh> mesh1 = std::make_shared<InstanceMesh>();
         mesh1 -> blockData = blockData;
         mesh1 -> direction =  ChunkMesh::ChunkMeshFaceDirection_XZ;
@@ -266,10 +263,11 @@ std::vector<std::shared_ptr<InstanceMesh>> Chunk::makeMeshesWithBlock(std::share
         mesh2 -> direction =  ChunkMesh::ChunkMeshFaceDirection_ZX;
         mesh2 ->offset = block -> getBlockPositonInWorld();
         meshes.push_back(mesh2);
+        
     }
     return meshes;
 }
 
 std::string Chunk::hashWithInstanceMesh(std::shared_ptr<InstanceMesh> mesh) {
-    return std::to_string(mesh -> blockData.blockId) + std::to_string(mesh -> direction);
+    return std::to_string(mesh -> blockData.blockId) + std::to_string(mesh -> direction);// + std::to_string(location.x) + std::to_string(location.y);
 }

@@ -10,7 +10,7 @@ RandomSingleton& RandomSingleton::sharedInstance() {
 }
 
 RandomSingleton::RandomSingleton() {
-    m_randomEngine.seed((int)std::time(nullptr));
+    randomEngine.seed((int)std::time(nullptr));
     for (int i = 0; i < 5; i++)
         intInRange(i, i * 5);
 }

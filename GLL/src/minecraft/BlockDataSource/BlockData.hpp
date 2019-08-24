@@ -12,6 +12,10 @@
 
 namespace GLL {
     
+    
+    
+    
+    
     typedef enum : int {
         BlockId_Air = 0,
         BlockId_Grass = 1,
@@ -70,6 +74,25 @@ namespace GLL {
     private:
         
     };
+    
+    
+    static std::string getBlockIdNameFrom(const BlockId& blockId) {
+        switch (blockId) {
+            case BlockId_Air: return "Air";
+            case BlockId_Grass: return "Grass";
+            case BlockId_Dirt: return "Dirt";
+            case BlockId_Stone: return "Stone";
+            case BlockId_Oakbark: return "Oakbark";
+            case BlockId_OakLeaft: return "OakLeaft";
+            case BlockId_Sand: return "Sand";
+            case BlockId_Water: return "Water";
+            case BlockId_Cactus: return "Cactus";
+            case BlockId_Rose: return "Rose";
+            case BlockId_TallGrass: return "allGrass";
+            case BlockId_DeadShrub: return "DeadShrub";
+            case BlockId_Count: return "";
+        }
+    }
 }
 
 

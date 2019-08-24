@@ -16,11 +16,11 @@ namespace GLL {
         T intInRange(T low, T high) {
             static_assert(std::is_integral<T>::value, "Not integral type!");
             std::uniform_int_distribution<T> dist(low, high);
-            return dist(m_randomEngine);
+            return dist(randomEngine);
         }
     private:
         RandomSingleton();
-        std::mt19937 m_randomEngine;
+        std::mt19937 randomEngine;
     };
 
     
@@ -28,7 +28,7 @@ namespace GLL {
     class Random {
     public:
         Random(int n = (int)std::time(nullptr)) {
-            m_randomEngine.seed(n);
+            randomEngine.seed(n);
             for (int i = 0; i < 5; i++)
                 intInRange(i, i * 5);
         }
@@ -36,13 +36,13 @@ namespace GLL {
         T intInRange(T low, T high) {
             static_assert(std::is_integral<T>::value, "Not integral type!");
             std::uniform_int_distribution<T> dist(low, high);
-            return dist(m_randomEngine);
+            return dist(randomEngine);
         }
         void setSeed(int seed) {
-            m_randomEngine.seed(seed);
+            randomEngine.seed(seed);
         }
     private:
-        REngine m_randomEngine;
+        REngine randomEngine;
     };
         
 }

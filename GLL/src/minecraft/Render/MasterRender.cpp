@@ -1,24 +1,27 @@
 
 #include "MasterRender.hpp"
-#include "World.hpp"
+
 
 using namespace GLL;
 
 
-MasterRender::MasterRender(World* world) :
+MasterRender::MasterRender() :
 skyboxRender(SkyboxRender()),
 chunkRender(ChunkRender("chunk.vert")),
 liquidRender(ChunkRender("water.vert")),
-floraRender(ChunkRender("flora.vert")),
+floraRender(ChunkRender("flora.vert"))
 #if TEXT_RENDER_ENABLED
-textRender(TextRender()),
+textRender(TextRender())
 #endif
-world(world) {
+{
     renderInit();
 }
 
+
+
 MasterRender::~MasterRender() {
 }
+
 
 void MasterRender::renderInit() {
 }
@@ -36,6 +39,11 @@ void MasterRender::draw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuf
 void MasterRender::drawSubRenders(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) {
     this -> skyboxRender.draw(camera, frameBuffer);
     
+#if TEXT_RENDER_ENABLED
+    this -> textRender.draw(camera, frameBuffer);
+#endif
+    
+    std::lock_guard<std::mutex> lock(this -> instanceMeshesMutex);
     for (auto one : instanceMeshes) {
         BlockShaderType shaderType = one.second -> getBlockData().shaderType;
         if (shaderType == BlockShaderType_Chunck) {
@@ -48,25 +56,26 @@ void MasterRender::drawSubRenders(std::shared_ptr<Camera> camera, std::shared_pt
             this -> floraRender.draw(camera, frameBuffer, one.second);
         }
     }
-#if TEXT_RENDER_ENABLED
-    this -> textRender.draw(camera, frameBuffer);
-#endif
 }
 
+
 std::shared_ptr<InstanceMeshDrawable> MasterRender::getInstanceMeshDrawable(const std::string& key) {
+    std::lock_guard<std::mutex> lock(this -> instanceMeshesMutex);
     if (this -> instanceMeshes.find(key) != this -> instanceMeshes.end()) {
         return this -> instanceMeshes[key];
     }
     return nullptr;
 }
 
-void MasterRender::insertInstanceMeshDrawableIfNeeded(std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>> pair) {
+void MasterRender::insertInstanceMeshDrawableIfNeeded(std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>>&& pair) {
+    std::lock_guard<std::mutex> lock(this -> instanceMeshesMutex);
     if (this -> instanceMeshes.find(pair.first) == this -> instanceMeshes.end()) {
-        this -> instanceMeshes.insert(pair);
+        this->instanceMeshes.emplace(std::move(pair));
     }
 }
 
 void MasterRender::clear() {
+    std::lock_guard<std::mutex> lock(this -> instanceMeshesMutex);
     this -> instanceMeshes.clear();
 }
 

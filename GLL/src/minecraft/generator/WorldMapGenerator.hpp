@@ -35,7 +35,7 @@ namespace GLL {
         const Biome& getBiome(int x, int z) const;
         Array2D<int, CHUNK_SIZE> heightMap;
         Array2D<int, CHUNK_SIZE + 1> biomeMap;
-        Random<std::minstd_rand> m_random;
+        Random<std::minstd_rand> random;
         
     private:
         static PerlinNoise biomeNoiseGen;

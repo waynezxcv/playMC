@@ -7,6 +7,21 @@
 using namespace GLL;
 
 
+
+TextureParameterOptions FrameBuffer::getDefaultTextureOptions() {
+    static TextureParameterOptions defaultTextureOptions;
+    defaultTextureOptions.minFilter = GL_LINEAR;
+    defaultTextureOptions.magFilter = GL_LINEAR;
+    defaultTextureOptions.wrapS = GL_CLAMP_TO_EDGE;
+    defaultTextureOptions.wrapT = GL_CLAMP_TO_EDGE;
+    defaultTextureOptions.wrapR = GL_CLAMP_TO_EDGE;
+    defaultTextureOptions.internalFormat = GL_RGBA;
+    defaultTextureOptions.format = GL_BGRA;
+    defaultTextureOptions.type = GL_UNSIGNED_BYTE;
+    return defaultTextureOptions;
+}
+
+
 FrameBuffer::FrameBuffer() :
 size(glm::vec2{WINDOW_WIDTH, WINDOW_HEIGHT}),
 textureOptions(FrameBuffer::getDefaultTextureOptions()),
@@ -40,7 +55,7 @@ void FrameBuffer::setup() {
     
     glGenFramebuffers(1, &frameBufferHandle);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBufferHandle);
-
+    
     
     // texture
     glGenTextures(1, &textureHandle);

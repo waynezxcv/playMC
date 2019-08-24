@@ -34,18 +34,7 @@ namespace GLL {
         // 当类被share_ptr管理，且在类的成员函数里需要把当前类对象作为参数传给其他函数时，就需要传递一个指向自身的share_ptr。
     public:
         
-        static TextureParameterOptions getDefaultTextureOptions() {
-            static TextureParameterOptions defaultTextureOptions;
-            defaultTextureOptions.minFilter = GL_LINEAR;
-            defaultTextureOptions.magFilter = GL_LINEAR;
-            defaultTextureOptions.wrapS = GL_CLAMP_TO_EDGE;
-            defaultTextureOptions.wrapT = GL_CLAMP_TO_EDGE;
-            defaultTextureOptions.wrapR = GL_CLAMP_TO_EDGE;
-            defaultTextureOptions.internalFormat = GL_RGBA;
-            defaultTextureOptions.format = GL_BGRA;
-            defaultTextureOptions.type = GL_UNSIGNED_BYTE;
-            return defaultTextureOptions;
-        }
+        static TextureParameterOptions getDefaultTextureOptions();
         
         FrameBuffer();
         ~FrameBuffer();

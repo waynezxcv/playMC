@@ -4,6 +4,8 @@
 
 #include <stdio.h>
 #include <vector>
+#include <memory>
+
 #include "WorkersManager.hpp"
 #include "MasterRender.hpp"
 #include "ChunkManager.hpp"
@@ -12,6 +14,7 @@
 
 
 namespace GLL {
+    
     class World {
     public:
         std::shared_ptr<Camera> camera;
@@ -19,6 +22,7 @@ namespace GLL {
     public:
         World();
         ~World();
+        
         void draw(std::shared_ptr<FrameBuffer> frameBuffer);
         MasterRender& getMasterRender();
         ChunkManager& getChunkManager();
@@ -31,14 +35,13 @@ namespace GLL {
         FPSCounter fpsCounter;
 
         int loadDistance = 2;
-        std::atomic<int> inflightCount {0};
         std::mutex mainMutex;
         
     private:
         void setSpawnPoint();
         void loadChunks(std::shared_ptr<Camera> camera);
-        void setupMeshInstances();
-        
+        void makeMeshInstances();
+        void render(std::shared_ptr<FrameBuffer> frameBuffer);
     };
 }
 

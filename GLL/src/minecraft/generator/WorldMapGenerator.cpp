@@ -46,11 +46,12 @@ void WorldMapGenerator::setUpNoise() {
     }
 }
 
+
 void WorldMapGenerator::generateTerrainFor(std::shared_ptr<Chunk> chunk) {
     this -> chunk = chunk;
     auto location = chunk -> getLocation();
     
-    m_random.setSeed(((int)location.x ^ (int)location.y) << 2);
+    random.setSeed(((int)location.x ^ (int)location.y) << 2);
     getBiomeMap();
     getHeightMap();
     
@@ -117,65 +118,76 @@ void WorldMapGenerator::getBiomeMap() {
 
 void WorldMapGenerator::setBlocks(int maxHeight) {
     
+    //    std::cout<<">>> set blocks with maxHeight : "<< maxHeight<<std::endl;
+    
     std::vector<glm::vec3> trees;
     std::vector<glm::vec3> plants;
     
     for (int y = 0; y < maxHeight + 1; y++) {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
+                
                 int height = heightMap.get(x, z);
                 auto& biome = getBiome(x, z);
                 
                 if (y > height) {
                     if (y <= WATER_LEVEL) {
                         chunk->setBlock(BlockId_Water, x, y, z);
+                        //                        std::cout<<">>> set block type : [water]  at: ["<<x<<" , "<<y<<" , "<<z<<"]"<<std::endl;
                     }
                     continue;
                 }
                 else if (y == height) {
+                    
                     if (y >= WATER_LEVEL) {
+                        
                         if (y < WATER_LEVEL + 4) {
-                            BlockId blockId = biome.getBeachBlock(m_random);
+                            
+                            BlockId blockId = biome.getBeachBlock(random);
                             chunk->setBlock(blockId, x, y, z);
+                            //                            std::cout<<">>> set block type : ["<< getBlockIdNameFrom(blockId)<< "] at: ["<<x<<" , "<<y<<" , "<<z<<"]"<<std::endl;
                             continue;
                         }
-                        if (m_random.intInRange(0, biome.getTreeFrequency()) == 5 ) {
+                        
+                        if (random.intInRange(0, biome.getTreeFrequency()) == 5 ) {
                             trees.emplace_back(x, y + 1, z);
                         }
-                        if (m_random.intInRange(0, biome.getPlantFrequency()) == 5 ) {
+                        if (random.intInRange(0, biome.getPlantFrequency()) == 5 ) {
                             plants.emplace_back(x, y + 1, z);
                         }
-                        BlockId blockId = biome.getTopBlock(m_random);
+                        BlockId blockId = biome.getTopBlock(random);
                         chunk->setBlock( blockId, x, y, z);
+                        //                        std::cout<<">>> set block type : ["<< getBlockIdNameFrom(blockId)<< "] at: ["<<x<<" , "<<y<<" , "<<z<<"]"<<std::endl;
                     }
                     else {
-                        BlockId blockId = biome.getUnderWaterBlock(m_random);
+                        BlockId blockId = biome.getUnderWaterBlock(random);
                         chunk->setBlock(blockId, x, y, z );
+                        //                        std::cout<<">>> set block type : ["<< getBlockIdNameFrom(blockId)<< "] at: ["<<x<<" , "<<y<<" , "<<z<<"]"<<std::endl;
                     }
                 }
                 else if (y > height - 3) {
                     chunk->setBlock(BlockId_Dirt, x, y, z);
+                    //                    std::cout<<">>> set block type : [Dirt]  at: ["<<x<<" , "<<y<<" , "<<z<<"]"<<std::endl;
                 }
                 else {
                     chunk->setBlock(BlockId_Stone ,x, y, z);
+                    //                    std::cout<<">>> set block type : [Stone]  at: ["<<x<<" , "<<y<<" , "<<z<<"]"<<std::endl;
                 }
             }
         }
     }
     
     for (auto& plant : plants) {
-        
         int x = plant.x;
         int z = plant.z;
-        
-        auto blockId = getBiome(x, z).getPlant(m_random);
+        auto blockId = getBiome(x, z).getPlant(random);
         chunk->setBlock(blockId, x, plant.y, z);
     }
     
     for (auto& tree : trees) {
         int x = tree.x;
         int z = tree.z;
-        getBiome(x, z).makeTree(m_random,this -> chunk, x, tree.y, z);
+        getBiome(x, z).makeTree(random,this -> chunk, x, tree.y, z);
     }
 }
 
@@ -189,11 +201,11 @@ const Biome& WorldMapGenerator::getBiome(int x, int z) const {
     }
     else if (biomeValue > 150) {
         return lightForest;
-
+        
     }
     else if (biomeValue > 130) {
         return grassBiome;
-
+        
     }
     else if (biomeValue > 120) {
         return temperateForest;

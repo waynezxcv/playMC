@@ -20,12 +20,19 @@ namespace GLL {
 }
 
 
-
 namespace GLL {
     
     /// Chunk是一个由16个Section组成的结构，他包含16 * 16 * 16 *16个block
     class Chunk : public std::enable_shared_from_this<Chunk> {
         friend ChunkManager;
+        
+    public:
+        
+        static VectorXZ normalizeChunkCoordination(int x, int z) {
+            int bX = x % CHUNK_SIZE;
+            int bZ = z % CHUNK_SIZE;
+            return VectorXZ{bX * CHUNK_SIZE, bZ * CHUNK_SIZE};
+        }
         
     public:
         Chunk(const GLfloat& x, const GLfloat& z);
@@ -71,6 +78,7 @@ namespace GLL {
         
         mutable std::mutex highesetBlocksMutex;
         std::unordered_map<VectorXZ, int> highestBlocks;
+        
     private:
         bool isOutOfBouds(const int index);
         void load(WorldMapGenerator& generator);
@@ -78,7 +86,6 @@ namespace GLL {
         void updateHighestBlocks(int x, int y, int z);
         std::vector<std::shared_ptr<InstanceMesh>> makeMeshesWithBlock(std::shared_ptr<ChunkBlock>block);
         std::string hashWithInstanceMesh(std::shared_ptr<InstanceMesh> mesh);
-        void internalMakeMeshes(std::shared_ptr<ChunkBlock> block, MasterRender& masterRender);
     };
 }
 

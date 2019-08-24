@@ -4,8 +4,7 @@
 
 using namespace GLL;
 
-BlockDataFactory::BlockDataFactory()
-{
+BlockDataFactory::BlockDataFactory() {
     blocks[(int)BlockId_Air] = std::make_unique<BlockData>("Air");
     blocks[(int)BlockId_Grass] = std::make_unique<BlockData>("Grass");
     blocks[(int)BlockId_Dirt] = std::make_unique<BlockData>("Dirt");

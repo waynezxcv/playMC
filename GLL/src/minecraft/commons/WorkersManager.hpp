@@ -16,10 +16,15 @@ namespace GLL {
     public:
         WorkersManager();
         ~WorkersManager();
-        std::vector<std::shared_ptr<Worker>>&& getbackgroundWorkers();
+        
+        void doAsync(std::function<void()> operation);
+        void doAsync(std::function<void()> operation, std::function<void()> completion);
+
     private:
+        std::atomic<int> inflightCount {0};
         void setupWorkers();
         std::vector<std::shared_ptr<Worker>> backgroundWorkers;
+        std::vector<std::shared_ptr<Worker>>&& getbackgroundWorkers();
     };
 }
 

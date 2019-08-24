@@ -6,6 +6,13 @@
 
 using namespace GLL;
 
+
+namespace GLL {
+    // 加载附近的4个chunk
+    constexpr int RENDER_DISTANCE =  CHUNK_SIZE * 2;
+}
+
+
 #pragma mark - LifeCycle
 
 ChunkManager::ChunkManager() {
@@ -16,17 +23,19 @@ ChunkManager::~ChunkManager() {
     chunkMap.clear();
 }
 
+
 #pragma mark - Blocks
 
 std::shared_ptr<ChunkBlock> ChunkManager::getBlock(int x,int y,int z) {
     std::lock_guard<std::mutex> lock(this -> chunkMapMutex);
-    VectorXZ xz = this -> normalizeChunkCoordination(x, z);
+    VectorXZ xz = Chunk::normalizeChunkCoordination(x, z);
     if (chunkMap.find(xz) == chunkMap.end()) {
         return nullptr;
     }
     auto chunk = chunkMap[xz];
     return chunk -> getBlock(x, y, z);
 }
+
 
 std::vector<std::shared_ptr<ChunkBlock>> ChunkManager::getBlocks() {
     std::lock_guard<std::mutex> lock(this -> blocksMutex);
@@ -54,16 +63,38 @@ void ChunkManager::traviesingChunks(std::function<void(std::shared_ptr<Chunk>)> 
     }
 }
 
-VectorXZ ChunkManager::normalizeChunkCoordination(int x, int z) {
-    int bX = x % CHUNK_SIZE;
-    int bZ = z % CHUNK_SIZE;
-    return VectorXZ{bX * CHUNK_SIZE, bZ * CHUNK_SIZE};
+void ChunkManager::traviesingNeedRenderChunks(std::function<void(std::shared_ptr<Chunk>)> callback) {
+    
+    glm::vec3 cameraPositon = this -> camera -> getCameraPosition();
+    int x = cameraPositon.x;
+    int z = cameraPositon.z;
+    
+    VectorXZ xz = Chunk::normalizeChunkCoordination(x, z);
+    x = xz.x;
+    z = xz.z;
+    
+    std::lock_guard<std::mutex> lock(this -> chunkMapMutex);
+    
+    for (auto& one : chunkMap) {
+        std::shared_ptr<Chunk> chunk = one.second;
+        glm::vec2 chunkLocaiton = chunk -> getLocation();
+        
+        if (abs(chunkLocaiton.x - cameraPositon.x) > RENDER_DISTANCE ||
+            abs(chunkLocaiton.y - cameraPositon.z) > RENDER_DISTANCE) {
+            continue;
+        }
+
+        if (callback) {
+            callback(chunk);
+        }
+    }
 }
+
 
 
 bool ChunkManager::loadChunk(int x, int z) {
     
-    VectorXZ xz = normalizeChunkCoordination(x, z);
+    VectorXZ xz = Chunk::normalizeChunkCoordination(x, z);
     x = xz.x;
     z = xz.z;
     
@@ -71,11 +102,11 @@ bool ChunkManager::loadChunk(int x, int z) {
     if (this -> chunkHasLoadedAt(x, z)) {
         return false;
     }
-    std::cout<<">> start load chunk at : [ "<<x<<" , "<<z<<" ] , total count : "<<this->getChunksCount()<<std::endl;
+    std::cout<<">> load chunk at : [ "<<x<<" , "<<z<<" ] , total loaded chunk count : [ "<<this->getChunksCount()<<" ]"<<std::endl;
+    
     // 2.生成地图
     std::shared_ptr<Chunk> chunk = this -> getChunk(x, z);
     chunk -> load(worldGenerator);
-    
     
     // 3. 遍历chunk中的sections, 添加到block容器中
     chunk->traversingSections([&](std::shared_ptr<ChunkSection> section) -> void {
@@ -88,42 +119,18 @@ bool ChunkManager::loadChunk(int x, int z) {
 }
 
 void ChunkManager::unloadChunk(int x, int z) {
-    VectorXZ xz = normalizeChunkCoordination(x, z);
+    VectorXZ xz = Chunk::normalizeChunkCoordination(x, z);
     x = xz.x;
     z = xz.z;
+    
     if (chunkExistAt(x, z)) {
+        std::cout<<">> unload chunk at : [ "<<x<<" , "<<z<<" ] , total loaded chunk count : [ "<<this->getChunksCount()<<" ]"<<std::endl;
         this -> chunkMapMutex.lock();
         chunkMap.erase(VectorXZ{x,z});
         this -> chunkMapMutex.unlock();
     }
 }
 
-void ChunkManager::updateNeedRenderChunks(std::shared_ptr<Camera> camera) {
-//    std::lock_guard<std::mutex> lock(this -> chunkMapMutex);
-//    for (auto iterator = chunkMap.begin(); iterator != chunkMap.end();) {
-//        VectorXZ xz = iterator -> first;
-//        std::shared_ptr<Chunk> chunk = iterator -> second;
-//        glm::vec3 cameraPosition = camera -> getCameraPosition();
-//
-//        int cameraX = cameraPosition.x;
-//        int cameraZ = cameraPosition.z;
-//        int minX = (cameraX / CHUNK_SIZE) - RENDER_DISTANCE;
-//        int minZ = (cameraZ / CHUNK_SIZE) - RENDER_DISTANCE;
-//        int maxX = (cameraX / CHUNK_SIZE) + RENDER_DISTANCE;
-//        int maxZ = (cameraZ / CHUNK_SIZE) + RENDER_DISTANCE;
-//        auto location = chunk -> getLocation();
-//
-//        if (minX > location.x || minZ > location.y || maxZ < location.y || maxX < location.x) {
-//            std::cout<<">> unload chunk at : [ "<<xz.x<<" , "<<xz.z<<" ]"<<std::endl;
-//            iterator = chunkMap.erase(iterator);
-//            continue;;
-//        }
-//        else {
-//            // need draws
-//            iterator++;
-//        }
-//    }
-}
 
 bool ChunkManager::chunkExistAt(int x, int z) {
     this -> chunkMapMutex.lock();
@@ -131,6 +138,7 @@ bool ChunkManager::chunkExistAt(int x, int z) {
     this -> chunkMapMutex.unlock();
     return existed;
 }
+
 
 std::shared_ptr<Chunk> ChunkManager::getChunk(int x, int z) {
     VectorXZ key {x,z};
@@ -160,11 +168,9 @@ bool ChunkManager::chunkHasLoadedAt(int x, int z) {
     return loaded;
 }
 
-
 WorldMapGenerator& ChunkManager::getWorldGenerator() {
     return worldGenerator;
 }
-
 
 unsigned int ChunkManager::getChunksCount() {
     this -> chunkMapMutex.lock();

@@ -86,6 +86,7 @@ void ChunkSection::travesingBlocks(std::function<void(std::shared_ptr<ChunkBlock
     }
 }
 
+
 void ChunkSection::setBlock(const BlockId& blockId,const int& x, const int& y, const int& z) {
     if (isOutOfBounds(x, y, z)) {
         return;
@@ -94,7 +95,6 @@ void ChunkSection::setBlock(const BlockId& blockId,const int& x, const int& y, c
     std::shared_ptr<ChunkBlock> block = this -> blockArray[x][y][z];
     block -> updateBlockId(blockId);
 }
-
 
 std::shared_ptr<ChunkBlock> ChunkSection::getBlock(const int& x, const int& y, const int& z) {
     std::lock_guard<std::mutex> lock(this -> blockArrayMutex);
