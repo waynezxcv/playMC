@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		0101F76A22F54A60004C5381 /* RandomSingleton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0101F76922F54A60004C5381 /* RandomSingleton.cpp */; };
 		0101F76D22F54DB1004C5381 /* FPSCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0101F76B22F54DB1004C5381 /* FPSCounter.cpp */; };
-		01096D5822EC858E00988D18 /* VectorXZ.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01096D5622EC858E00988D18 /* VectorXZ.cpp */; };
 		010E872322E4B06E00455494 /* OceanBiome.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 010E872122E4B06E00455494 /* OceanBiome.cpp */; };
 		010E872622E4B1D800455494 /* WorldMapGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 010E872422E4B1D800455494 /* WorldMapGenerator.cpp */; };
 		010E872C22E4B3F400455494 /* GeneralMaths.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 010E872A22E4B3F400455494 /* GeneralMaths.cpp */; };
@@ -44,6 +43,7 @@
 		015B3E1D22DA31470091CBBB /* CubeTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 015B3E1B22DA31470091CBBB /* CubeTexture.cpp */; };
 		0174725022D0F306009F5D49 /* Window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0174724F22D0F306009F5D49 /* Window.cpp */; };
 		0174725422D0F533009F5D49 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0174725322D0F533009F5D49 /* Camera.cpp */; };
+		017EAFF32311DE38002EDDB7 /* VectorXZ.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 017EAFF22311DE38002EDDB7 /* VectorXZ.cpp */; };
 		018D014922DA24AA00AB9B60 /* Cube.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 018D014722DA24AA00AB9B60 /* Cube.cpp */; };
 		019A8B9022E0E9820073D2E8 /* PerlinNoise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 019A8B8E22E0E9820073D2E8 /* PerlinNoise.cpp */; };
 		019DAB2822DA3DED000CD15E /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 019DAB2622DA3DED000CD15E /* World.cpp */; };
@@ -87,8 +87,6 @@
 		0101F76922F54A60004C5381 /* RandomSingleton.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RandomSingleton.cpp; sourceTree = "<group>"; };
 		0101F76B22F54DB1004C5381 /* FPSCounter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FPSCounter.cpp; sourceTree = "<group>"; };
 		0101F76C22F54DB1004C5381 /* FPSCounter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FPSCounter.hpp; sourceTree = "<group>"; };
-		01096D5622EC858E00988D18 /* VectorXZ.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = VectorXZ.cpp; path = ../../../../../../../../System/Volumes/Data/Users/liuwei/Desktop/GLL/GLL/src/minecraft/Chunk/VectorXZ.cpp; sourceTree = "<group>"; };
-		01096D5722EC858E00988D18 /* VectorXZ.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = VectorXZ.hpp; path = ../../../../../../../../System/Volumes/Data/Users/liuwei/Desktop/GLL/GLL/src/minecraft/Chunk/VectorXZ.hpp; sourceTree = "<group>"; };
 		010E872122E4B06E00455494 /* OceanBiome.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = OceanBiome.cpp; sourceTree = "<group>"; };
 		010E872222E4B06E00455494 /* OceanBiome.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = OceanBiome.hpp; sourceTree = "<group>"; };
 		010E872422E4B1D800455494 /* WorldMapGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = WorldMapGenerator.cpp; path = ../../../../../../../../System/Volumes/Data/Users/liuwei/Desktop/GLL/GLL/src/minecraft/generator/WorldMapGenerator.cpp; sourceTree = "<group>"; };
@@ -568,6 +566,8 @@
 		0174724F22D0F306009F5D49 /* Window.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Window.cpp; sourceTree = "<group>"; };
 		0174725322D0F533009F5D49 /* Camera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Camera.cpp; sourceTree = "<group>"; };
 		017E803A22EF3F1400D025CD /* Worker.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Worker.hpp; sourceTree = "<group>"; };
+		017EAFF12311DE38002EDDB7 /* VectorXZ.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = VectorXZ.hpp; sourceTree = "<group>"; };
+		017EAFF22311DE38002EDDB7 /* VectorXZ.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VectorXZ.cpp; sourceTree = "<group>"; };
 		018D014122D9D76000AB9B60 /* rock.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rock.obj; sourceTree = "<group>"; };
 		018D014222D9D76000AB9B60 /* Rock-Texture-Surface.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "Rock-Texture-Surface.jpg"; sourceTree = "<group>"; };
 		018D014322D9D76000AB9B60 /* rock.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rock.mtl; sourceTree = "<group>"; };
@@ -751,15 +751,11 @@
 		0132A28422E0BF3C00385779 /* Chunk */ = {
 			isa = PBXGroup;
 			children = (
-				0149DAB222E6394D000C3B6C /* InstanceMeshDrawable.hpp */,
-				0149DAB122E6394D000C3B6C /* InstanceMeshDrawable.cpp */,
 				019A8B9222E0EAEF0073D2E8 /* ChunkDefine.hpp */,
-				01096D5722EC858E00988D18 /* VectorXZ.hpp */,
-				01096D5622EC858E00988D18 /* VectorXZ.cpp */,
-				01455A1822FEF1C800DC9EA4 /* VectorXYZ.hpp */,
-				01455A1722FEF1C800DC9EA4 /* VectorXYZ.cpp */,
 				0114913E22E32CCA0043E0F8 /* ChunkManager.hpp */,
 				0114913D22E32CCA0043E0F8 /* ChunkManager.cpp */,
+				0149DAB222E6394D000C3B6C /* InstanceMeshDrawable.hpp */,
+				0149DAB122E6394D000C3B6C /* InstanceMeshDrawable.cpp */,
 				0132A29222E0DECA00385779 /* Chunk.hpp */,
 				0132A29122E0DECA00385779 /* Chunk.cpp */,
 				0132A29522E0DED500385779 /* ChunkSection.hpp */,
@@ -1300,7 +1296,7 @@
 			path = render;
 			sourceTree = "<group>";
 		};
-		0142ADE822E47D42008FB3E4 /* generator */ = {
+		0142ADE822E47D42008FB3E4 /* MapGenerator */ = {
 			isa = PBXGroup;
 			children = (
 				0142ADED22E47DC4008FB3E4 /* TerrainGenerator.hpp */,
@@ -1327,7 +1323,7 @@
 				01B5D62522E4A7620010F88D /* TemperateForestBiome.hpp */,
 				01B5D62422E4A7620010F88D /* TemperateForestBiome.cpp */,
 			);
-			path = generator;
+			path = MapGenerator;
 			sourceTree = "<group>";
 		};
 		01476C7422D26132000DDC15 /* planet */ = {
@@ -1358,16 +1354,20 @@
 		0154D93322C152EB000D6755 /* commons */ = {
 			isa = PBXGroup;
 			children = (
+				017E803A22EF3F1400D025CD /* Worker.hpp */,
 				01DD4E4022F66E1A000DC5CF /* WorkersManager.hpp */,
 				01DD4E3F22F66E1A000DC5CF /* WorkersManager.cpp */,
-				017E803A22EF3F1400D025CD /* Worker.hpp */,
-				010E872822E4B32D00455494 /* Array2D.hpp */,
 				0101F76822F54A60004C5381 /* RandomSingleton.hpp */,
 				0101F76922F54A60004C5381 /* RandomSingleton.cpp */,
 				0154D93622C15358000D6755 /* FileManager.hpp */,
 				013BE6C822C14D6B00695FF8 /* NonCopyable.hpp */,
 				0101F76C22F54DB1004C5381 /* FPSCounter.hpp */,
 				0101F76B22F54DB1004C5381 /* FPSCounter.cpp */,
+				017EAFF12311DE38002EDDB7 /* VectorXZ.hpp */,
+				017EAFF22311DE38002EDDB7 /* VectorXZ.cpp */,
+				01455A1822FEF1C800DC9EA4 /* VectorXYZ.hpp */,
+				01455A1722FEF1C800DC9EA4 /* VectorXYZ.cpp */,
+				010E872822E4B32D00455494 /* Array2D.hpp */,
 			);
 			path = commons;
 			sourceTree = "<group>";
@@ -1530,7 +1530,7 @@
 				01B2C85A22E43E7400FCDAF2 /* Render */,
 				0132A27722DE22C400385779 /* BlockDataSource */,
 				0132A28422E0BF3C00385779 /* Chunk */,
-				0142ADE822E47D42008FB3E4 /* generator */,
+				0142ADE822E47D42008FB3E4 /* MapGenerator */,
 			);
 			path = minecraft;
 			sourceTree = "<group>";
@@ -1633,7 +1633,6 @@
 				0101F76D22F54DB1004C5381 /* FPSCounter.cpp in Sources */,
 				01B02CD222F75B0A00366385 /* Player.cpp in Sources */,
 				013BE88322C14D7300695FF8 /* glm.cpp in Sources */,
-				01096D5822EC858E00988D18 /* VectorXZ.cpp in Sources */,
 				0132A29322E0DECA00385779 /* Chunk.cpp in Sources */,
 				019A8B9022E0E9820073D2E8 /* PerlinNoise.cpp in Sources */,
 				01B2C86722E43EC000FCDAF2 /* MasterRender.cpp in Sources */,
@@ -1661,6 +1660,7 @@
 				01455A1922FEF1C800DC9EA4 /* VectorXYZ.cpp in Sources */,
 				01B5D62C22E4A9B10010F88D /* StructureBuilder.cpp in Sources */,
 				019DAB4C22DAE080000CD15E /* TextureAtlas.cpp in Sources */,
+				017EAFF32311DE38002EDDB7 /* VectorXZ.cpp in Sources */,
 				015B3E1A22DA313E0091CBBB /* BasicTexture.cpp in Sources */,
 				0110BE3B22C7C49F0074472A /* FrameBuffer.cpp in Sources */,
 				01B5D61D22E4A7340010F88D /* DesertBiome.cpp in Sources */,
