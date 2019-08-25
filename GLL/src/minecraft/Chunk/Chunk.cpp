@@ -48,18 +48,15 @@ void Chunk::setBlock(const BlockId& blockId, GLfloat x,  GLfloat y, GLfloat z) {
     this -> updateHighestBlocks(x, y, z);
 }
 
-
 void Chunk::updateNearestChunkSections(std::shared_ptr<ChunkSection> section) {
     
     GLuint sectionIndex = section -> getIndexOfParentChunkSections();
     if (sectionMap.find(sectionIndex - 1) != sectionMap.end()) {
         section -> downChunkSection = sectionMap.at(sectionIndex - 1);
     }
-    
     if (sectionMap.find(sectionIndex + 1) != sectionMap.end()) {
         section -> upChunkSection = sectionMap.at(sectionIndex + 1);
     }
-    
     std::shared_ptr<Chunk> leftChunk = this -> getLeftChunk();
     if (leftChunk != nullptr) {
         std::shared_ptr<ChunkSection> chunkSection = leftChunk -> getSection(sectionIndex);
@@ -74,7 +71,6 @@ void Chunk::updateNearestChunkSections(std::shared_ptr<ChunkSection> section) {
             section -> rightChunkSection = chunkSection;
         }
     }
-    
     std::shared_ptr<Chunk> frontChunk = this -> getFrontChunk();
     if (frontChunk != nullptr) {
         std::shared_ptr<ChunkSection> chunkSection = frontChunk -> getSection(sectionIndex);

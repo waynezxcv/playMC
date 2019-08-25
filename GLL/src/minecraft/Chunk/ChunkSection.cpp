@@ -27,7 +27,6 @@ ChunkSection::~ChunkSection() {
     
 }
 
-
 void ChunkSection::setupBlocks() {
     if (hasLoaded == true) {
         return;
@@ -82,6 +81,7 @@ void ChunkSection::updateFacesX(std::shared_ptr<ChunkBlock> block, int x, int y,
             if (blockArray[x + 1][y][z] != nullptr) /* Face X+ */ {
                 block -> rightBlockId = blockArray[x + 1][y][z] -> getBlockData().blockId;
             }
+#if CUSTOM_CULL_HORIZON_FACE_ENABLED
             // 左表面
             std::shared_ptr<ChunkSection> leftSection = this -> getLeftSection();
             if (leftSection == nullptr) {
@@ -96,9 +96,10 @@ void ChunkSection::updateFacesX(std::shared_ptr<ChunkBlock> block, int x, int y,
                     block -> leftBlockId = leftBlock -> getBlockData().blockId;
                 }
             }
+#endif
         }
-        
         else if (x == CHUNK_SIZE - 1) {
+#if CUSTOM_CULL_HORIZON_FACE_ENABLED
             // 右表面
             std::shared_ptr<ChunkSection> rightSection = this -> getRightSection();
             if (rightSection == nullptr) {
@@ -113,6 +114,7 @@ void ChunkSection::updateFacesX(std::shared_ptr<ChunkBlock> block, int x, int y,
                     block -> rightBlockId = rightBlock -> getBlockData().blockId;
                 }
             }
+#endif
             //左表面
             if (blockArray[x - 1][y][z] != nullptr) {
                 block->leftBlockId = blockArray[x - 1][y][z] -> getBlockData().blockId;
@@ -141,6 +143,7 @@ void ChunkSection::updateFacesY(std::shared_ptr<ChunkBlock> block, int x, int y,
             block -> downBlockId = BlockId_Count;
         }
         else if (y == CHUNK_SIZE - 1) {
+            
             // 上表面
             std::shared_ptr<ChunkSection> upSection = this -> getUpSection();
             if (upSection == nullptr) {
@@ -155,6 +158,7 @@ void ChunkSection::updateFacesY(std::shared_ptr<ChunkBlock> block, int x, int y,
                     block -> upBlockId = upBlock -> getBlockData().blockId;
                 }
             }
+            
             // 下表面
             if (blockArray[x][y - 1][z] != nullptr) {
                 block -> downBlockId = blockArray[x][y - 1][z] -> getBlockData().blockId;
@@ -174,6 +178,7 @@ void ChunkSection::updateFacesZ(std::shared_ptr<ChunkBlock> block, int x, int y,
     }
     else {
         if (z == 0) {
+#if CUSTOM_CULL_HORIZON_FACE_ENABLED
             // 后表面
             std::shared_ptr<ChunkSection> backSection = this -> getBackSection();
             if (backSection == nullptr) {
@@ -188,7 +193,7 @@ void ChunkSection::updateFacesZ(std::shared_ptr<ChunkBlock> block, int x, int y,
                     block -> backBlockId = backBlock -> getBlockData().blockId;
                 }
             }
-            
+#endif
             //前表面
             if (blockArray[x][y][z + 1] != nullptr) /* Face Z+ */ {
                 block -> frontBlockId = blockArray[x][y][z + 1] -> getBlockData().blockId;
@@ -201,7 +206,7 @@ void ChunkSection::updateFacesZ(std::shared_ptr<ChunkBlock> block, int x, int y,
             if (blockArray[x][y][z - 1] != nullptr) /* Face Z- */ {
                 block -> backBlockId = blockArray[x][y][z - 1] -> getBlockData().blockId;
             }
-            
+#if CUSTOM_CULL_HORIZON_FACE_ENABLED
             // 前表面
             std::shared_ptr<ChunkSection> frontSection = this -> getFrontSection();
             if (frontSection == nullptr) {
@@ -216,6 +221,8 @@ void ChunkSection::updateFacesZ(std::shared_ptr<ChunkBlock> block, int x, int y,
                     block -> frontBlockId = frontBlock -> getBlockData().blockId;
                 }
             }
+            
+#endif
         }
     }
 }

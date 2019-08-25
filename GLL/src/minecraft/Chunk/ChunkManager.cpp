@@ -55,7 +55,7 @@ void ChunkManager::traviesingChunks(std::function<void(std::shared_ptr<Chunk>)> 
         std::shared_ptr<Chunk> chunk = one.second;
         glm::vec2 chunkLocaiton = chunk -> getLocation();
         if (abs(chunkLocaiton.x - cameraPositon.x) > RENDER_DISTANCE ||
-            abs(chunkLocaiton.y - cameraPositon.x) > RENDER_DISTANCE ) {
+            abs(chunkLocaiton.y - cameraPositon.z) > RENDER_DISTANCE ) {
             if (unRenderChunks) {
                 unRenderChunks(chunk);
             }
@@ -84,10 +84,8 @@ bool ChunkManager::loadChunk(int x, int z) {
     // 3.设置相邻的chunk
     this -> updateNearestChunks();
     
-    
     // 4. 加载生成类型
     chunk -> load(this -> getWorldGenerator());
-    
     
     // 5. 遍历chunk中的sections, 添加到block容器中
     chunk->traversingSections([&](std::shared_ptr<ChunkSection> section) -> void {
