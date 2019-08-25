@@ -284,7 +284,6 @@ std::shared_ptr<ChunkSection> ChunkSection::getDownSection() {
     return nullptr;
 }
 
-
 std::shared_ptr<ChunkSection> ChunkSection::getLeftSection() {
     std::shared_ptr<ChunkSection> sp = nullptr;
     if ( (sp = this -> leftChunkSection.lock()) ) {
