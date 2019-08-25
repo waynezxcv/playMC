@@ -1,10 +1,3 @@
-//
-//  VectorXYZ.hpp
-//  GLL
-//
-//  Created by 刘微 on 2019/8/10.
-//  Copyright © 2019 liu.wei. All rights reserved.
-//
 
 #ifndef VectorXYZ_hpp
 #define VectorXYZ_hpp
