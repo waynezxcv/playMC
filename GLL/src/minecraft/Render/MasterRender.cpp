@@ -58,7 +58,6 @@ void MasterRender::drawSubRenders(std::shared_ptr<Camera> camera, std::shared_pt
     }
 }
 
-
 std::shared_ptr<InstanceMeshDrawable> MasterRender::getInstanceMeshDrawable(const std::string& key) {
     std::lock_guard<std::mutex> lock(this -> instanceMeshesMutex);
     if (this -> instanceMeshes.find(key) != this -> instanceMeshes.end()) {
@@ -71,6 +70,15 @@ void MasterRender::insertInstanceMeshDrawableIfNeeded(std::pair<std::string, std
     std::lock_guard<std::mutex> lock(this -> instanceMeshesMutex);
     if (this -> instanceMeshes.find(pair.first) == this -> instanceMeshes.end()) {
         this->instanceMeshes.emplace(std::move(pair));
+    }
+}
+
+
+void MasterRender::remvoeInstanceMeshDrawableIfNeeded(std::string&& key) {
+    std::lock_guard<std::mutex> lock(this -> instanceMeshesMutex);
+    auto itr = this -> instanceMeshes.find(key);
+    if (itr != this -> instanceMeshes.end()) {
+        this -> instanceMeshes.erase(itr);
     }
 }
 

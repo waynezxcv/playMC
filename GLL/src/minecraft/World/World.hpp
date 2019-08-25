@@ -33,15 +33,12 @@ namespace GLL {
         glm::vec3 playerSpawnPoint;
         WorkersManager workersManager;
         FPSCounter fpsCounter;
-
         int loadDistance = 2;
         std::mutex mainMutex;
-        
     private:
-        void setSpawnPoint();
         void loadChunks(std::shared_ptr<Camera> camera);
+        void renderWorld(std::shared_ptr<FrameBuffer> frameBuffer);
         void makeMeshInstances();
-        void render(std::shared_ptr<FrameBuffer> frameBuffer);
     };
 }
 

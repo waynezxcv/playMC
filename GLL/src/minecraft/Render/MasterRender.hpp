@@ -35,6 +35,9 @@ namespace GLL {
         void draw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) override;
         std::shared_ptr<InstanceMeshDrawable> getInstanceMeshDrawable(const std::string& key);
         void insertInstanceMeshDrawableIfNeeded(std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>>&& pair);
+        void remvoeInstanceMeshDrawableIfNeeded(std::string&& key);
+        
+        
         void clear();
     public:
         ChunkRender chunkRender;

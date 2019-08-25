@@ -28,6 +28,8 @@ namespace GLL {
         void instanceDraw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer);
         BlockDataContent getBlockData() const;
         
+    
+        
     private:
         GLuint VAO, VBO, EBO = 0;
         GLuint instanceVBO = 0;
@@ -37,8 +39,6 @@ namespace GLL {
         
         std::vector<glm::vec3> offsets;
         std::mutex offsetsMutex;
-        
-        
         
         BlockDataContent blockData;
         ChunkMesh::ChunkMeshFaceDirection direction;

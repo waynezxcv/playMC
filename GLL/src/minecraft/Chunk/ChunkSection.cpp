@@ -22,15 +22,17 @@ aabb({CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE})
     aabb.update({positionInWorld.x * CHUNK_SIZE, positionInWorld.y * CHUNK_SIZE, positionInWorld.z * CHUNK_SIZE});
 }
 
-ChunkSection::~ChunkSection() {}
+
+ChunkSection::~ChunkSection() {
+    
+}
+
 
 void ChunkSection::setupBlocks() {
-    
     if (hasLoaded == true) {
         return;
     }
     hasLoaded = true;
-    
     std::shared_ptr<ChunkSection> shared = shared_from_this();
     std::weak_ptr<ChunkSection> weakSelf = shared;
     for (int i = 0; i < CHUNK_SIZE; i ++) {
@@ -45,41 +47,173 @@ void ChunkSection::setupBlocks() {
     }
 }
 
-
 void ChunkSection::travesingBlocks(std::function<void(std::shared_ptr<ChunkBlock>)> callback) {
-    
     std::lock_guard<std::mutex> lock(this -> blockArrayMutex);
-    
     for (int x = 0; x < CHUNK_SIZE; x ++) {
         for (int y = 0; y < CHUNK_SIZE; y ++) {
             for (int z = 0; z < CHUNK_SIZE; z ++) {
                 std::shared_ptr<ChunkBlock> block = this -> blockArray[x][y][z];
 #if CUSTOM_CULL_FACE_ENABLED
-                if (x > 0 && blockArray[x - 1][y][z] != nullptr) {
-                    block->leftBlockId = blockArray[x - 1][y][z] -> getBlockData().blockId;
-                }
-                if(x < CHUNK_SIZE - 1 && blockArray[x + 1][y][z] != nullptr) /* Face X+ */ {
-                    block->rightBlockId = blockArray[x + 1][y][z] -> getBlockData().blockId;
-                }
-                
-                if(y > 0 && blockArray[x][y - 1][z] != nullptr) /* Face Y- */ {
-                    block -> downBlockId = blockArray[x][y - 1][z] -> getBlockData().blockId;
-                }
-                
-                if(y < CHUNK_SIZE - 1  && blockArray[x][y + 1][z] != nullptr) /* Face Y+ */ {
-                    block -> upBlockId = blockArray[x][y + 1][z] -> getBlockData().blockId;
-                }
-                
-                if(z > 0 && blockArray[x][y][z - 1] != nullptr) /* Face Z- */ {
-                    block -> backBlockId = blockArray[x][y][z - 1] -> getBlockData().blockId;
-                }
-                
-                if(z < CHUNK_SIZE - 1 &&blockArray[x][y][z + 1] != nullptr) /* Face Z+ */ {
-                    block -> frontBlockId = blockArray[x][y][z + 1] -> getBlockData().blockId;
-                }
+                this -> updateFacesX(block, x, y, z);
+                this -> updateFacesY(block, x, y, z);
+                this -> updateFacesZ(block, x, y, z);
 #endif
                 if (callback) {
                     callback(block);
+                }
+            }
+        }
+    }
+}
+
+void ChunkSection::updateFacesX(std::shared_ptr<ChunkBlock> block, int x, int y, int z) {
+    if (x > 0 && x < CHUNK_SIZE - 1) {
+        if (x > 0 && blockArray[x - 1][y][z] != nullptr) {
+            block->leftBlockId = blockArray[x - 1][y][z] -> getBlockData().blockId;
+        }
+        if (x < CHUNK_SIZE - 1 && blockArray[x + 1][y][z] != nullptr) /* Face X+ */ {
+            block->rightBlockId = blockArray[x + 1][y][z] -> getBlockData().blockId;
+        }
+    }
+    else {
+        
+        if (x == 0) {
+            // 右表面
+            if (blockArray[x + 1][y][z] != nullptr) /* Face X+ */ {
+                block -> rightBlockId = blockArray[x + 1][y][z] -> getBlockData().blockId;
+            }
+            // 左表面
+            std::shared_ptr<ChunkSection> leftSection = this -> getLeftSection();
+            if (leftSection == nullptr) {
+                block -> leftBlockId = BlockId_Air;
+            }
+            else {
+                std::shared_ptr<ChunkBlock> leftBlock = leftSection -> getBlock(CHUNK_SIZE - 1, y, z);
+                if (leftBlock == nullptr) {
+                    block -> leftBlockId = BlockId_Air;
+                }
+                else {
+                    block -> leftBlockId = leftBlock -> getBlockData().blockId;
+                }
+            }
+        }
+        
+        else if (x == CHUNK_SIZE - 1) {
+            // 右表面
+            std::shared_ptr<ChunkSection> rightSection = this -> getRightSection();
+            if (rightSection == nullptr) {
+                block -> rightBlockId = BlockId_Air;
+            }
+            else {
+                std::shared_ptr<ChunkBlock> rightBlock = rightSection -> getBlock(0, y, z);
+                if (rightBlock == nullptr) {
+                    block -> rightBlockId = BlockId_Air;
+                }
+                else {
+                    block -> rightBlockId = rightBlock -> getBlockData().blockId;
+                }
+            }
+            //左表面
+            if (blockArray[x - 1][y][z] != nullptr) {
+                block->leftBlockId = blockArray[x - 1][y][z] -> getBlockData().blockId;
+            }
+        }
+    }
+}
+
+
+void ChunkSection::updateFacesY(std::shared_ptr<ChunkBlock> block, int x, int y, int z) {
+    if (y > 0 && y < CHUNK_SIZE - 1) {
+        if (blockArray[x][y - 1][z] != nullptr) {
+            block -> downBlockId = blockArray[x][y - 1][z] -> getBlockData().blockId;
+        }
+        if (blockArray[x][y + 1][z] != nullptr) {
+            block -> upBlockId = blockArray[x][y + 1][z] -> getBlockData().blockId;
+        }
+    }
+    else {
+        if (y == 0) {
+            // 上表面
+            if (blockArray[x][y + 1][z] != nullptr) {
+                block -> upBlockId = blockArray[x][y + 1][z] -> getBlockData().blockId;
+            }
+            // 下表面
+            block -> downBlockId = BlockId_Count;
+        }
+        else if (y == CHUNK_SIZE - 1) {
+            // 上表面
+            std::shared_ptr<ChunkSection> upSection = this -> getUpSection();
+            if (upSection == nullptr) {
+                block -> upBlockId = BlockId_Air;
+            }
+            else {
+                std::shared_ptr<ChunkBlock> upBlock = upSection -> getBlock(x, 0, z);
+                if (upBlock == nullptr) {
+                    block -> upBlockId = BlockId_Air;
+                }
+                else {
+                    block -> upBlockId = upBlock -> getBlockData().blockId;
+                }
+            }
+            // 下表面
+            if (blockArray[x][y - 1][z] != nullptr) {
+                block -> downBlockId = blockArray[x][y - 1][z] -> getBlockData().blockId;
+            }
+        }
+    }
+}
+
+void ChunkSection::updateFacesZ(std::shared_ptr<ChunkBlock> block, int x, int y, int z) {
+    if (z > 0 && z < CHUNK_SIZE - 1) {
+        if (blockArray[x][y][z - 1] != nullptr) /* Face Z- */ {
+            block -> backBlockId = blockArray[x][y][z - 1] -> getBlockData().blockId;
+        }
+        if (blockArray[x][y][z + 1] != nullptr) /* Face Z+ */ {
+            block -> frontBlockId = blockArray[x][y][z + 1] -> getBlockData().blockId;
+        }
+    }
+    else {
+        if (z == 0) {
+            // 后表面
+            std::shared_ptr<ChunkSection> backSection = this -> getBackSection();
+            if (backSection == nullptr) {
+                block -> backBlockId = BlockId_Air;
+            }
+            else {
+                std::shared_ptr<ChunkBlock> backBlock = backSection -> getBlock(x, y, CHUNK_SIZE - 1);
+                if (backBlock == nullptr) {
+                    block -> backBlockId = BlockId_Air;
+                }
+                else {
+                    block -> backBlockId = backBlock -> getBlockData().blockId;
+                }
+            }
+            
+            //前表面
+            if (blockArray[x][y][z + 1] != nullptr) /* Face Z+ */ {
+                block -> frontBlockId = blockArray[x][y][z + 1] -> getBlockData().blockId;
+            }
+        }
+        
+        else if (z == CHUNK_SIZE - 1) {
+            
+            // 后表面
+            if (blockArray[x][y][z - 1] != nullptr) /* Face Z- */ {
+                block -> backBlockId = blockArray[x][y][z - 1] -> getBlockData().blockId;
+            }
+            
+            // 前表面
+            std::shared_ptr<ChunkSection> frontSection = this -> getFrontSection();
+            if (frontSection == nullptr) {
+                block -> frontBlockId = BlockId_Air;
+            }
+            else {
+                std::shared_ptr<ChunkBlock> frontBlock = frontSection -> getBlock(x, y, 0);
+                if (frontBlock == nullptr) {
+                    block -> frontBlockId = BlockId_Air;
+                }
+                else {
+                    block -> frontBlockId = frontBlock -> getBlockData().blockId;
                 }
             }
         }
@@ -115,7 +249,6 @@ GLuint ChunkSection::getIndexOfParentChunkSections() const {
 }
 
 bool ChunkSection::isOutOfBounds(const int& x, const int& y, const int& z) {
-    
     if (x < 0 || x >= CHUNK_SIZE) {
         return true;
     }
@@ -130,14 +263,63 @@ bool ChunkSection::isOutOfBounds(const int& x, const int& y, const int& z) {
 
 std::shared_ptr<Chunk> ChunkSection::getParentChunk() {
     std::shared_ptr<Chunk> sp = nullptr;
-    if ((sp = this -> parentChunk.lock())) {
+    if ( (sp = this -> parentChunk.lock()) ) {
         return sp;
     }
-    else {
-        return nullptr;
-    }
+    return nullptr;
 }
 
 void ChunkSection::setNeedUpdate() {
     this -> isNeedUpdate = true;
+}
+
+std::shared_ptr<ChunkSection> ChunkSection::getUpSection() {
+    std::shared_ptr<ChunkSection> sp = nullptr;
+    if ( (sp = this -> upChunkSection.lock()) ) {
+        return sp;
+    }
+    return nullptr;
+}
+
+std::shared_ptr<ChunkSection> ChunkSection::getDownSection() {
+    std::shared_ptr<ChunkSection> sp = nullptr;
+    if ( (sp = this -> downChunkSection.lock()) ) {
+        return sp;
+    }
+    return nullptr;
+}
+
+
+std::shared_ptr<ChunkSection> ChunkSection::getLeftSection() {
+    std::shared_ptr<ChunkSection> sp = nullptr;
+    if ( (sp = this -> leftChunkSection.lock()) ) {
+        return sp;
+    }
+    return nullptr;
+}
+
+std::shared_ptr<ChunkSection> ChunkSection::getRightSection() {
+    std::shared_ptr<ChunkSection> sp = nullptr;
+    if ( (sp = this -> rightChunkSection.lock()) ) {
+        return sp;
+    }
+    return nullptr;
+}
+
+
+std::shared_ptr<ChunkSection> ChunkSection::getFrontSection() {
+    std::shared_ptr<ChunkSection> sp = nullptr;
+    if ( (sp = this -> frontChunkSection.lock()) ) {
+        return sp;
+    }
+    return nullptr;
+}
+
+std::shared_ptr<ChunkSection> ChunkSection::getBackSection() {
+    std::shared_ptr<ChunkSection> sp = nullptr;
+    if ( (sp = this -> backChunkSection.lock()) ) {
+        return sp;
+    }
+    return nullptr;
+    
 }

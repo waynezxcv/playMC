@@ -32,9 +32,8 @@ namespace GLL {
         std::shared_ptr<ChunkBlock> getBlock(int x,int y,int z);
         std::vector<std::shared_ptr<ChunkBlock>> getBlocks();
         void travesingBlocks(std::function<void(std::shared_ptr<ChunkBlock>)> callback);
-        void traviesingChunks(std::function<void(std::shared_ptr<Chunk>)> callback);
-        void traviesingNeedRenderChunks(std::function<void(std::shared_ptr<Chunk>)> callback);
-
+        void traviesingChunks(std::function<void(std::shared_ptr<Chunk>)> renderChunks, std::function<void(std::shared_ptr<Chunk>)> unRenderChunks);
+        
     private:
         
         // chunk容器，key是对应的坐标，value是chunk对象
@@ -46,16 +45,16 @@ namespace GLL {
         std::vector<std::shared_ptr<ChunkBlock>> blocks;
         
         // others
-        WorldMapGenerator worldGenerator;
-        
+        std::unique_ptr<WorldMapGenerator> worldGenerator;
         std::shared_ptr<Camera> camera;
-        
     private:
+        
         bool loadChunk(int x, int z);
         void unloadChunk(int x, int z);
         bool chunkExistAt(int x, int z);
         bool chunkHasLoadedAt(int x, int z);
         unsigned int getChunksCount();
+        void updateNearestChunks();
         
         WorldMapGenerator& getWorldGenerator();
         std::shared_ptr<Chunk> getChunk(int x, int z);

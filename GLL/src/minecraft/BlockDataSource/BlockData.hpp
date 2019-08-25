@@ -29,7 +29,7 @@ namespace GLL {
         BlockId_Rose = 9,
         BlockId_TallGrass = 10,
         BlockId_DeadShrub = 11,
-        BlockId_Count = 12,
+        BlockId_Count = 12, // 
     } BlockId;
     
     

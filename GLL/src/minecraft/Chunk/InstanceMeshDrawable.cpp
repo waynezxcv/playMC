@@ -107,7 +107,6 @@ void InstanceMeshDrawable::bufferData() {
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * MAX_OFFSETS_DATA_SIZE, NULL, GL_STATIC_DRAW);
     
-    
     std::lock_guard<std::mutex> lock(this -> offsetsMutex);
     if (this -> currentBuffredOffsetsCount != offsets.size()) {
         this -> bufferInstanceSubData();
@@ -118,7 +117,6 @@ void InstanceMeshDrawable::bufferData() {
     glVertexAttribDivisor(4, 1);
     glBindVertexArray(0);
 }
-
 
 void InstanceMeshDrawable::bufferInstanceSubData() {
     auto delta = offsets.size() - currentBuffredOffsetsCount;
@@ -172,6 +170,7 @@ void InstanceMeshDrawable::addMeshOffsets(std::vector<glm::vec3>&& rhs) {
         std::cout<<"[ERROR] the offsets is heap over flow ... "<<std::endl;
     }
 }
+
 
 BlockDataContent InstanceMeshDrawable::getBlockData() const {
     return this -> blockData;

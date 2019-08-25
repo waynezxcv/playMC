@@ -56,9 +56,17 @@ namespace GLL {
         /// 设置为需要更新
         void setNeedUpdate();
         
+        std::weak_ptr<ChunkSection> upChunkSection;
+        std::weak_ptr<ChunkSection> downChunkSection;
+        
+        std::weak_ptr<ChunkSection> leftChunkSection;
+        std::weak_ptr<ChunkSection> rightChunkSection;
+        
+        std::weak_ptr<ChunkSection> frontChunkSection;
+        std::weak_ptr<ChunkSection> backChunkSection;
+
     private:
         AABB aabb;
-
         std::weak_ptr<Chunk> parentChunk;
         glm::vec2 parentChunkPosition;
         glm::vec3 positionInWorld;
@@ -71,9 +79,25 @@ namespace GLL {
         std::atomic<bool> isNeedUpdate {false};
         
     private:
+        
         void setupBlocks();
         bool isOutOfBounds(const int& x, const int& y, const int& z);
         int getBlockIndexWithBlockPosition(const int& x, const int& y, const int& z) const;
+        
+        
+        void updateFacesX(std::shared_ptr<ChunkBlock> block, int x, int y, int z);
+        void updateFacesY(std::shared_ptr<ChunkBlock> block, int x, int y, int z);
+        void updateFacesZ(std::shared_ptr<ChunkBlock> block, int x, int y, int z);
+        
+        std::shared_ptr<ChunkSection> getUpSection();
+        std::shared_ptr<ChunkSection> getDownSection();
+        
+        std::shared_ptr<ChunkSection> getLeftSection();
+        std::shared_ptr<ChunkSection> getRightSection();
+        
+        std::shared_ptr<ChunkSection> getFrontSection();
+        std::shared_ptr<ChunkSection> getBackSection();
+
     };
 }
 

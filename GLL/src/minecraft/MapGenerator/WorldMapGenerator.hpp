@@ -23,6 +23,8 @@ namespace GLL {
     public:
         
         WorldMapGenerator();
+        ~WorldMapGenerator();
+        
         void generateTerrainFor(std::shared_ptr<Chunk> chunk) override;
         int  getMinimumSpawnHeight() const noexcept override;
         

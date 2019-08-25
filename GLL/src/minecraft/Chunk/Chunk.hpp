@@ -28,17 +28,15 @@ namespace GLL {
         
     public:
         
-        static VectorXZ normalizeChunkCoordination(int x, int z) {
-            int bX = x % CHUNK_SIZE;
-            int bZ = z % CHUNK_SIZE;
-            return VectorXZ{bX * CHUNK_SIZE, bZ * CHUNK_SIZE};
-        }
+        static VectorXZ normalizeChunkCoordination(int x, int z);
+        
         
     public:
         Chunk(const GLfloat& x, const GLfloat& z);
         ~Chunk();
         bool makeMeshIfNeeded(MasterRender& render);
-        
+        bool unMakeMeshIfNeeded(MasterRender& render);
+
     public:
         /// 遍历chunk中的section
         /// @param callback  回调，会依次返回section，是线程安全的
@@ -67,6 +65,13 @@ namespace GLL {
         /// 根据世界坐标获取到某个block
         std::shared_ptr<ChunkBlock> getBlock(int x, int y, int z);
         
+        
+        std::weak_ptr<Chunk> leftChunk;
+        std::weak_ptr<Chunk> rightChunk;
+        std::weak_ptr<Chunk> frontChunk;
+        std::weak_ptr<Chunk> backChunk;
+        
+        
     private:
         std::atomic<bool> hasLoaded {false};
         std::atomic<bool> isNeedUpdateMesh {true};
@@ -80,12 +85,19 @@ namespace GLL {
         std::unordered_map<VectorXZ, int> highestBlocks;
         
     private:
+        
         bool isOutOfBouds(const int index);
         void load(WorldMapGenerator& generator);
         void setupSectionIfNeeded(int index);
         void updateHighestBlocks(int x, int y, int z);
         std::vector<std::shared_ptr<InstanceMesh>> makeMeshesWithBlock(std::shared_ptr<ChunkBlock>block);
         std::string hashWithInstanceMesh(std::shared_ptr<InstanceMesh> mesh);
+        
+        void updateNearestChunkSections(std::shared_ptr<ChunkSection> section);
+        std::shared_ptr<Chunk> getLeftChunk();
+        std::shared_ptr<Chunk> getRightChunk();
+        std::shared_ptr<Chunk> getFrontChunk();
+        std::shared_ptr<Chunk> getBackChunk();
     };
 }
 

@@ -46,6 +46,10 @@ void WorldMapGenerator::setUpNoise() {
     }
 }
 
+WorldMapGenerator::~WorldMapGenerator() {
+    
+}
+
 
 void WorldMapGenerator::generateTerrainFor(std::shared_ptr<Chunk> chunk) {
     this -> chunk = chunk;
