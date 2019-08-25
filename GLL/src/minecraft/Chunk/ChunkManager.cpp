@@ -102,7 +102,6 @@ void ChunkManager::unloadChunk(int x, int z) {
     VectorXZ xz = Chunk::normalizeChunkCoordination(x, z);
     x = xz.x;
     z = xz.z;
-    
     if (chunkExistAt(x, z)) {
         std::cout<<">> unload chunk at : [ "<<x<<" , "<<z<<" ] , total loaded chunk count : [ "<<this->getChunksCount()<<" ]"<<std::endl;
         this -> chunkMapMutex.lock();
