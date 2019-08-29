@@ -7,27 +7,25 @@
 #include "NonCopyable.hpp"
 #include "Worker.hpp"
 
-namespace  {
-    constexpr GLuint WORKER_COUNT = 3;
-}
-
 namespace GLL {
     class WorkersManager : public NonCopyable {
     public:
-        static WorkersManager& sharedInstance();
-        
-        
+        explicit WorkersManager(const unsigned int& workersCount);
+        WorkersManager(WorkersManager&& rhs);
+
         ~WorkersManager();
-        
         void doAsync(std::function<void()> operation);
         void doAsync(std::function<void()> operation, std::function<void()> completion);
         
         
+        
     private:
-        WorkersManager();
+        unsigned workerCount = 0;
         std::atomic<int> inflightCount {0};
-        void setupWorkers();
         std::vector<std::shared_ptr<Worker>> backgroundWorkers;
+
+    private:
+        void setupWorkers();
         std::vector<std::shared_ptr<Worker>>&& getbackgroundWorkers();
     };
 }

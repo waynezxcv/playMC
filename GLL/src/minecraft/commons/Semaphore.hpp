@@ -1,10 +1,3 @@
-//
-//  Semaphore.hpp
-//  GLL
-//
-//  Created by 刘微 on 2019/8/29.
-//  Copyright © 2019 liu.wei. All rights reserved.
-//
 
 #ifndef Semaphore_hpp
 #define Semaphore_hpp
@@ -25,7 +18,7 @@ namespace GLL {
         void wait();
         void signal();
     private:
-        int m_count; //计数器必须是有符号数
+        int count; //计数器必须是有符号数
         std::mutex m_mutex;
         std::condition_variable m_condition_variable;
     };

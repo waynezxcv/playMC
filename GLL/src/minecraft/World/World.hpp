@@ -11,6 +11,8 @@
 #include "ChunkManager.hpp"
 #include "FPSCounter.hpp"
 #include "Player.hpp"
+#include "Semaphore.hpp"
+
 
 
 namespace GLL {
@@ -34,6 +36,11 @@ namespace GLL {
         FPSCounter fpsCounter;
         int loadDistance = 2;
         std::mutex mainMutex;
+        std::shared_ptr<Semaphore> semaphore = std::make_shared<Semaphore>(0);
+        
+        WorkersManager loadWorkerManager;
+        WorkersManager renderWorkerManager;
+        
     private:
         void loadChunks(std::shared_ptr<Camera> camera);
         void renderWorld(std::shared_ptr<FrameBuffer> frameBuffer);

@@ -175,7 +175,6 @@ glm::vec2 Chunk::getLocation() const {
 }
 
 bool Chunk::makeMeshIfNeeded(MasterRender& masterRender) {
-    
     if (this -> hasLoaded == false) {
         return false;
     }
@@ -207,7 +206,9 @@ bool Chunk::makeMeshIfNeeded(MasterRender& masterRender) {
         });
     });
     
+    
     startTime = glfwGetTime();
+    
     
     for (auto& one : offsetsMap) {
         std::string key = one.first;
@@ -217,15 +218,14 @@ bool Chunk::makeMeshIfNeeded(MasterRender& masterRender) {
             drawable -> addMeshOffsets(std::move(offsets));
         }
     }
-    
     return true;
 }
+
 
 bool Chunk::unMakeMeshIfNeeded(MasterRender& masterRender) {
     //TODO:移除
     return true;
 }
-
 
 /*
  mesh表示一个block一个面的相关数据

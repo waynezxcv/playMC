@@ -64,19 +64,14 @@ namespace GLL {
         
         /// 根据世界坐标获取到某个block
         std::shared_ptr<ChunkBlock> getBlock(int x, int y, int z);
-        
-        
         std::weak_ptr<Chunk> leftChunk;
         std::weak_ptr<Chunk> rightChunk;
         std::weak_ptr<Chunk> frontChunk;
         std::weak_ptr<Chunk> backChunk;
         
-        
     private:
         std::atomic<bool> hasLoaded {false};
-        
         glm::vec2 location;
-        
         std::mutex sectionMapMutex;
         std::unordered_map<int, std::shared_ptr<ChunkSection>> sectionMap;
         
