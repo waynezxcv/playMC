@@ -84,6 +84,8 @@ void MasterRender::remvoeInstanceMeshDrawableIfNeeded(std::string&& key) {
 
 void MasterRender::clear() {
     std::lock_guard<std::mutex> lock(this -> instanceMeshesMutex);
-    this -> instanceMeshes.clear();
+    for (auto& one : this -> instanceMeshes) {
+        one.second -> clearInstanceVboData();
+    }
 }
 

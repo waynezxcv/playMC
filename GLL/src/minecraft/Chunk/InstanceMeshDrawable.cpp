@@ -14,8 +14,13 @@ InstanceMeshDrawable::InstanceMeshDrawable(const BlockDataContent& blockData ,co
 blockData(blockData),
 direction(direction)
 {
-    currentBuffredOffsetsCount = 0;
 }
+
+
+BlockDataContent InstanceMeshDrawable::getBlockData() const {
+    return this -> blockData;
+}
+
 
 InstanceMeshDrawable::~InstanceMeshDrawable() {
     if (VAO != 0) {
@@ -32,8 +37,21 @@ InstanceMeshDrawable::~InstanceMeshDrawable() {
     }
 }
 
-void InstanceMeshDrawable::bufferData() {
+void InstanceMeshDrawable::makeVertices(const std::vector<glm::vec3>& face, const std::vector<glm::vec2>& texCoords, const GLfloat& cardinalLight) {
+    for (int i = 0; i <  4; i ++) {
+        ChunkMesh::ChunkMeshVertex vertex;
+        vertex.vertextPosition = glm::vec3{face[i].x, face[i].y, face[i].z};
+        vertex.texCoords = texCoords[i];
+        vertex.normal = glm::vec3 {1.0f}; // TODO：
+        vertex.cardinalLight = cardinalLight;
+        vertices.push_back(vertex);
+    }
+}
 
+void InstanceMeshDrawable::bufferVaoData() {
+    
+    vaoDataBuffered = true;
+    
     switch (direction) {
         case ChunkMesh::ChunkMeshFaceDirection_PositiveY: {
             makeVertices(topFace,TextureAtlas::sharedInstance().textureCoordsFromTexutreIndex(blockData.topTextureCoords), LIGHT_TOP);
@@ -107,58 +125,10 @@ void InstanceMeshDrawable::bufferData() {
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * MAX_OFFSETS_DATA_SIZE, NULL, GL_STATIC_DRAW);
     
-    std::lock_guard<std::mutex> lock(this -> offsetsMutex);
-    if (this -> currentBuffredOffsetsCount != offsets.size()) {
-        this -> bufferInstanceSubData();
-    }
-    
     glEnableVertexAttribArray(4);
     glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void *) (0));
     glVertexAttribDivisor(4, 1);
     glBindVertexArray(0);
-}
-
-void InstanceMeshDrawable::bufferInstanceSubData() {
-    auto delta = offsets.size() - currentBuffredOffsetsCount;
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    glBufferSubData(GL_ARRAY_BUFFER, currentBuffredOffsetsCount * sizeof(glm::vec3), delta * sizeof(glm::vec3), & offsets[currentBuffredOffsetsCount]);
-    currentBuffredOffsetsCount = (GLuint)offsets.size();
-}
-
-void InstanceMeshDrawable::makeVertices(const std::vector<glm::vec3>& face, const std::vector<glm::vec2>& texCoords, const GLfloat& cardinalLight) {
-    for (int i = 0; i <  4; i ++) {
-        ChunkMesh::ChunkMeshVertex vertex;
-        vertex.vertextPosition = glm::vec3{face[i].x, face[i].y, face[i].z};
-        vertex.texCoords = texCoords[i];
-        vertex.normal = glm::vec3 {1.0f}; // TODO：
-        vertex.cardinalLight = cardinalLight;
-        vertices.push_back(vertex);
-    }
-}
-
-void InstanceMeshDrawable::instanceDraw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) {
-
-    if (dataBuffered == false) {
-        bufferData();
-        dataBuffered = true;
-    }
-    
-    std::lock_guard<std::mutex> lock(this -> offsetsMutex);
-    if (this -> currentBuffredOffsetsCount != offsets.size()) {
-        this -> bufferInstanceSubData();
-    }
-    
-    TextureAtlas::sharedInstance().bindTexture();
-#if POLYGON_LINE_ENAGLED
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-#endif
-    glBindVertexArray(VAO);
-    glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0, currentBuffredOffsetsCount);
-    glBindVertexArray(0);
-#if POLYGON_LINE_ENAGLED
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-#endif
-    TextureAtlas::sharedInstance().unbindTexture();
 }
 
 void InstanceMeshDrawable::addMeshOffsets(std::vector<glm::vec3>&& rhs) {
@@ -166,12 +136,42 @@ void InstanceMeshDrawable::addMeshOffsets(std::vector<glm::vec3>&& rhs) {
     for (auto offset : rhs) {
         this -> offsets.emplace_back(std::move(offset));
     }
+    
     if (offsets.size() > MAX_OFFSETS_DATA_SIZE) {
         std::cout<<"[ERROR] the offsets is heap over flow ... "<<std::endl;
     }
 }
 
-
-BlockDataContent InstanceMeshDrawable::getBlockData() const {
-    return this -> blockData;
+void InstanceMeshDrawable::bufferInstanceVboData() {
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, usedInstanceBufferLength * sizeof(glm::vec3), &offsets[0]);
+    usedInstanceBufferLength = (int)offsets.size();
 }
+
+void InstanceMeshDrawable::clearInstanceVboData() {
+    this -> offsets.clear();
+}
+
+
+void InstanceMeshDrawable::instanceDraw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) {
+    
+    if (vaoDataBuffered == false) {
+        bufferVaoData();
+    }
+    
+    std::lock_guard<std::mutex> lock(this -> offsetsMutex);
+    this -> bufferInstanceVboData();
+
+    TextureAtlas::sharedInstance().bindTexture();
+#if POLYGON_LINE_ENAGLED
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+#endif
+    glBindVertexArray(VAO);
+    glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0, usedInstanceBufferLength);
+    glBindVertexArray(0);
+#if POLYGON_LINE_ENAGLED
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#endif
+    TextureAtlas::sharedInstance().unbindTexture();
+}
+

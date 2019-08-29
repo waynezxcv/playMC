@@ -14,6 +14,8 @@
 #include "FrameBuffer.hpp"
 #include "BlockData.hpp"
 #include "Chunk.hpp"
+#include "Semaphore.hpp"
+
 
 
 namespace GLL {
@@ -28,26 +30,25 @@ namespace GLL {
         void instanceDraw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer);
         BlockDataContent getBlockData() const;
         
-    
-        
+        void clearInstanceVboData();
+
     private:
-        GLuint VAO, VBO, EBO = 0;
-        GLuint instanceVBO = 0;
-        
-        bool dataBuffered;
-        GLuint currentBuffredOffsetsCount;
-        
-        std::vector<glm::vec3> offsets;
-        std::mutex offsetsMutex;
-        
         BlockDataContent blockData;
         ChunkMesh::ChunkMeshFaceDirection direction;
         std::vector<ChunkMesh::ChunkMeshVertex> vertices;
+
+        GLuint VAO, VBO, EBO = 0;
+        GLuint instanceVBO = 0;
+        std::atomic<bool> vaoDataBuffered{false};
+        std::atomic<int> usedInstanceBufferLength {0};
         
+        std::vector<glm::vec3> offsets;
+        std::mutex offsetsMutex;
+                
     private:
         void makeVertices(const std::vector<glm::vec3>& face, const std::vector<glm::vec2>& texCoords, const GLfloat& cardinalLight);
-        void bufferData();
-        void bufferInstanceSubData();
+        void bufferVaoData();
+        void bufferInstanceVboData();
     };
 }
 

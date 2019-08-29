@@ -31,7 +31,6 @@ namespace GLL {
         MasterRender masterRender;
         ChunkManager chunkManager;
         glm::vec3 playerSpawnPoint;
-        WorkersManager workersManager;
         FPSCounter fpsCounter;
         int loadDistance = 2;
         std::mutex mainMutex;

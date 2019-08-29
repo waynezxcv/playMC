@@ -74,7 +74,6 @@ namespace GLL {
         
     private:
         std::atomic<bool> hasLoaded {false};
-        std::atomic<bool> isNeedUpdateMesh {true};
         
         glm::vec2 location;
         

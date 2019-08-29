@@ -3,6 +3,7 @@
 #include "Window.hpp"
 #include "Camera.hpp"
 #include "Render.hpp"
+#include "WorkersManager.hpp"
 
 namespace GLL {
     
@@ -136,6 +137,7 @@ namespace GLL {
             default: return CameraMovement_Unkonw;
         }
     }
+    
     
     template <typename T>
     void Application<T>::displayRunloopHandle(std::shared_ptr<FrameBuffer> frameBuffer) {

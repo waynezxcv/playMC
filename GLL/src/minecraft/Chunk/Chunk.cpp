@@ -180,10 +180,6 @@ bool Chunk::makeMeshIfNeeded(MasterRender& masterRender) {
         return false;
     }
     
-    if (this -> isNeedUpdateMesh == false) {
-        return false;
-    }
-    this -> isNeedUpdateMesh = false;
     double startTime = glfwGetTime();
     
     std::map<std::string, std::vector<glm::vec3>> offsetsMap;
@@ -221,6 +217,7 @@ bool Chunk::makeMeshIfNeeded(MasterRender& masterRender) {
             drawable -> addMeshOffsets(std::move(offsets));
         }
     }
+    
     return true;
 }
 
@@ -260,7 +257,10 @@ std::vector<std::shared_ptr<InstanceMesh>> Chunk::makeMeshesWithBlock(std::share
         }
         
         // 顶部
-        if ( block -> upBlockId == BlockId_Air) {
+        if ( block -> upBlockId == BlockId_Air ||
+            block -> upBlockId == BlockId_Rose ||
+            block -> upBlockId == BlockId_DeadShrub ||
+            block -> upBlockId == BlockId_TallGrass) {
             std::shared_ptr<InstanceMesh> mesh = std::make_shared<InstanceMesh>();
             mesh -> blockData = blockData;
             mesh -> direction =  ChunkMesh::ChunkMeshFaceDirection_PositiveY;

@@ -4,6 +4,11 @@
 
 using namespace GLL;
 
+WorkersManager& WorkersManager::sharedInstance() {
+    static WorkersManager manager;
+    return manager;
+}
+
 WorkersManager::WorkersManager() {
     setupWorkers();
 }

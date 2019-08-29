@@ -14,6 +14,7 @@
 		0110BE3822C7A8520074472A /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0110BE3722C7A8520074472A /* Image.cpp */; };
 		0110BE3B22C7C49F0074472A /* FrameBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0110BE3922C7C49F0074472A /* FrameBuffer.cpp */; };
 		0114913F22E32CCA0043E0F8 /* ChunkManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0114913D22E32CCA0043E0F8 /* ChunkManager.cpp */; };
+		0126673B23175E5900965C8C /* Semaphore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0126673923175E5900965C8C /* Semaphore.cpp */; };
 		012EDBC022D1A36E0060D3EA /* Frustum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 012EDBBE22D1A36E0060D3EA /* Frustum.cpp */; };
 		0132A29322E0DECA00385779 /* Chunk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0132A29122E0DECA00385779 /* Chunk.cpp */; };
 		0132A29622E0DED500385779 /* ChunkSection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0132A29422E0DED500385779 /* ChunkSection.cpp */; };
@@ -116,6 +117,8 @@
 		0110BE3A22C7C49F0074472A /* FrameBuffer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FrameBuffer.hpp; sourceTree = "<group>"; };
 		0114913D22E32CCA0043E0F8 /* ChunkManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChunkManager.cpp; sourceTree = "<group>"; };
 		0114913E22E32CCA0043E0F8 /* ChunkManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChunkManager.hpp; sourceTree = "<group>"; };
+		0126673923175E5900965C8C /* Semaphore.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Semaphore.cpp; sourceTree = "<group>"; };
+		0126673A23175E5900965C8C /* Semaphore.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Semaphore.hpp; sourceTree = "<group>"; };
 		012EDBBE22D1A36E0060D3EA /* Frustum.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Frustum.cpp; sourceTree = "<group>"; };
 		012EDBBF22D1A36E0060D3EA /* Frustum.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Frustum.hpp; sourceTree = "<group>"; };
 		0132A29122E0DECA00385779 /* Chunk.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Chunk.cpp; sourceTree = "<group>"; };
@@ -1368,6 +1371,8 @@
 				01455A1822FEF1C800DC9EA4 /* VectorXYZ.hpp */,
 				01455A1722FEF1C800DC9EA4 /* VectorXYZ.cpp */,
 				010E872822E4B32D00455494 /* Array2D.hpp */,
+				0126673A23175E5900965C8C /* Semaphore.hpp */,
+				0126673923175E5900965C8C /* Semaphore.cpp */,
 			);
 			path = commons;
 			sourceTree = "<group>";
@@ -1631,6 +1636,7 @@
 				0114913F22E32CCA0043E0F8 /* ChunkManager.cpp in Sources */,
 				01FA33A522C8A2F400C76D08 /* FrameBufferCache.cpp in Sources */,
 				015B3E1D22DA31470091CBBB /* CubeTexture.cpp in Sources */,
+				0126673B23175E5900965C8C /* Semaphore.cpp in Sources */,
 				017EB014231226E8002EDDB7 /* PerlinNoise.cpp in Sources */,
 				017EB013231226E8002EDDB7 /* BiomeGenerator.cpp in Sources */,
 				0101F76D22F54DB1004C5381 /* FPSCounter.cpp in Sources */,

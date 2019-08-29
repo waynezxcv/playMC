@@ -4,6 +4,8 @@
 #include "RandomSingleton.hpp"
 #include "Camera.hpp"
 #include "InstanceMeshDrawable.hpp"
+#include "WorkersManager.hpp"
+
 
 using namespace GLL;
 
@@ -29,22 +31,10 @@ World::~World() {
 #pragma mark -
 
 
-void World::draw(std::shared_ptr<FrameBuffer> frameBuffer) {
-    // 加载 chunks
-    this -> loadChunks(this -> camera);
-    // 更新Meshes
-    this -> makeMeshInstances();
-    // 渲染
-    this -> renderWorld(frameBuffer);
-}
-
 
 void World::loadChunks(std::shared_ptr<Camera> camera) {
-    
     glm::vec3 cameraPosiiton = camera -> getCameraPosition();
-    
-    workersManager.doAsync([=]()-> void {
-        
+    WorkersManager::sharedInstance().doAsync([=]()-> void {
         bool isChunkLoaded = false;
         int cameraX = cameraPosiiton.x / CHUNK_SIZE;
         int cameraZ = cameraPosiiton.z / CHUNK_SIZE;
@@ -78,10 +68,9 @@ void World::loadChunks(std::shared_ptr<Camera> camera) {
     });
 }
 
-
 void World::makeMeshInstances() {
     // 以chunk为单位进行绘制
-    workersManager.doAsync([&]()->void {
+    WorkersManager::sharedInstance().doAsync([=]()-> void {
         chunkManager.traviesingChunks(
                                       [&](std::shared_ptr<Chunk> chunk) -> void {
                                           chunk -> makeMeshIfNeeded(masterRender);
@@ -90,15 +79,14 @@ void World::makeMeshInstances() {
                                           chunk -> unMakeMeshIfNeeded(masterRender);
                                       }
                                       );
-        
     });
 }
+
 
 void World::renderWorld(std::shared_ptr<FrameBuffer> frameBuffer) {
     this -> masterRender.draw(camera, frameBuffer);
     this -> fpsCounter.update();
 }
-
 
 MasterRender& World::getMasterRender() {
     return this -> masterRender;
@@ -106,4 +94,13 @@ MasterRender& World::getMasterRender() {
 
 ChunkManager& World::getChunkManager() {
     return this -> chunkManager;
+}
+
+void World::draw(std::shared_ptr<FrameBuffer> frameBuffer) {
+    // 加载 chunks
+    this -> loadChunks(this -> camera);
+    // 更新Meshes
+    this -> makeMeshInstances();
+    // 渲染
+    this -> renderWorld(frameBuffer);
 }

@@ -14,13 +14,17 @@ namespace  {
 namespace GLL {
     class WorkersManager : public NonCopyable {
     public:
-        WorkersManager();
+        static WorkersManager& sharedInstance();
+        
+        
         ~WorkersManager();
         
         void doAsync(std::function<void()> operation);
         void doAsync(std::function<void()> operation, std::function<void()> completion);
-
+        
+        
     private:
+        WorkersManager();
         std::atomic<int> inflightCount {0};
         void setupWorkers();
         std::vector<std::shared_ptr<Worker>> backgroundWorkers;
