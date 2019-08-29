@@ -18,7 +18,7 @@ Semaphore::~Semaphore() {
 void Semaphore::wait() {
     std::unique_lock<std::mutex> unique_lock(m_mutex);
     -- count;
-    while (m_count < 0) {
+    while (count < 0) {
         m_condition_variable.wait(unique_lock);
     }
 }
