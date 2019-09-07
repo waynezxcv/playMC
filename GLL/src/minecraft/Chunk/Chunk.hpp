@@ -23,8 +23,12 @@ namespace GLL {
 }
 
 namespace GLL {
-    using TempOffsetMapTyep =  std::unordered_map<std::string, std::shared_ptr<ChunkMeshSectionCollection>>;
-    
+    using MeshOffsetCollectionMapType = std::unordered_map<std::string, std::shared_ptr<ChunkMeshSectionCollection>>;
+}
+
+
+namespace GLL {
+
     /// Chunk是一个由16个Section组成的结构，他包含16 * 16 * 16 *16个block
     class Chunk : public std::enable_shared_from_this<Chunk> {
         friend ChunkManager;
@@ -97,8 +101,8 @@ namespace GLL {
         std::shared_ptr<Chunk> getRightChunk();
         std::shared_ptr<Chunk> getFrontChunk();
         std::shared_ptr<Chunk> getBackChunk();
-        void onTravesingForMakeMesh(MasterRender& masterRender, VectorXZ&& chunkLocation, const int& sectionIndex, AABB aabb, std::shared_ptr<ChunkBlock> block, TempOffsetMapTyep& tempOffsetsMap);
-        void addMeshOffsetsWithTemp(MasterRender& masterRender, VectorXZ&& chunkLocation, TempOffsetMapTyep& tempOffsetsMap);
+        void onTravesingForMakeMesh(MasterRender& masterRender, VectorXZ&& chunkLocation, const int& sectionIndex, AABB aabb, std::shared_ptr<ChunkBlock> block, MeshOffsetCollectionMapType& tempOffsetsMap);
+        void addMeshOffsetsWithTemp(MasterRender& masterRender, VectorXZ&& chunkLocation, MeshOffsetCollectionMapType& tempOffsetsMap);
     };
 }
 

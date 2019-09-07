@@ -19,7 +19,7 @@ aabb({CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE})
         parentChunkPosition = sp -> getLocation();
     }
     positionInWorld = glm::vec3{ parentChunkPosition.x, index * CHUNK_SIZE, parentChunkPosition.y };
-    aabb.update({positionInWorld.x * CHUNK_SIZE, positionInWorld.y * CHUNK_SIZE, positionInWorld.z * CHUNK_SIZE});
+    aabb.update({positionInWorld.x, positionInWorld.y, positionInWorld.z});
 }
 
 ChunkSection::~ChunkSection() {

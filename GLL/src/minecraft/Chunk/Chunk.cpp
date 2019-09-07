@@ -187,15 +187,15 @@ bool Chunk::makeMeshIfNeeded(MasterRender& masterRender, std::shared_ptr<Camera>
     this -> isNeedUpdate = false;
     
     VectorXZ chunkLocation = VectorXZ{static_cast<int>(this->location.x),static_cast<int>(this->location.y)};
-    TempOffsetMapTyep tempOffsetsMap;
+    MeshOffsetCollectionMapType tempCollection;
     
     this -> traversingSections([&](std::shared_ptr<ChunkSection> section) -> void {
         int sectionIndex = section -> getIndexOfParentChunkSections();
         section -> travesingBlocks([&](std::shared_ptr<ChunkBlock> block) -> void {
-            this -> onTravesingForMakeMesh(masterRender, std::move(chunkLocation), sectionIndex, section -> getAABB(), block, tempOffsetsMap);
+            this -> onTravesingForMakeMesh(masterRender, std::move(chunkLocation), sectionIndex, section -> getAABB(), block, tempCollection);
         });
     });
-    this -> addMeshOffsetsWithTemp(masterRender, std::move(chunkLocation), tempOffsetsMap);
+    this -> addMeshOffsetsWithTemp(masterRender, std::move(chunkLocation), tempCollection);
     return true;
 }
 
@@ -204,7 +204,7 @@ void Chunk::onTravesingForMakeMesh(MasterRender& masterRender,
                                    const int& sectionIndex,
                                    AABB aabb,
                                    std::shared_ptr<ChunkBlock> block,
-                                   TempOffsetMapTyep& tempOffsetsMap) {
+                                   MeshOffsetCollectionMapType& tempCollection) {
     
     std::vector<std::shared_ptr<InstanceMesh>> meshes = this -> makeMeshesWithBlock(block);
     for (auto mesh : meshes) {
@@ -219,9 +219,9 @@ void Chunk::onTravesingForMakeMesh(MasterRender& masterRender,
         // step.2 clear offsets for this chunk
         drawable -> clearOffsetsFor(std::move(chunkLocation));
         // step.3 add offsets to temp map
-        bool found = tempOffsetsMap.find(key) != tempOffsetsMap.end();
+        bool found = tempCollection.find(key) != tempCollection.end();
         if (found) {
-            std::shared_ptr<ChunkMeshSectionCollection> sectionCollection = tempOffsetsMap.at(key);
+            std::shared_ptr<ChunkMeshSectionCollection> sectionCollection = tempCollection.at(key);
             auto offsetCollection = sectionCollection -> sections.at(sectionIndex);
             offsetCollection -> aabb = aabb;
             offsetCollection -> offsets.emplace_back(std::move( mesh -> offset));
@@ -232,13 +232,13 @@ void Chunk::onTravesingForMakeMesh(MasterRender& masterRender,
             offsetCollection -> aabb = aabb;
             offsetCollection -> offsets.emplace_back(std::move( mesh -> offset));
             std::pair<std::string, std::shared_ptr<ChunkMeshSectionCollection>> pair(key, sectionCollection);
-            tempOffsetsMap.insert(pair);
+            tempCollection.insert(pair);
         }
     }
 }
 
-void Chunk::addMeshOffsetsWithTemp(MasterRender& masterRender, VectorXZ&& chunkLocation, TempOffsetMapTyep& tempOffsetsMap) {
-    for (auto& one : tempOffsetsMap) {
+void Chunk::addMeshOffsetsWithTemp(MasterRender& masterRender, VectorXZ&& chunkLocation, MeshOffsetCollectionMapType& tempCollection) {
+    for (auto& one : tempCollection) {
         std::string key = one.first;
         std::shared_ptr<ChunkMeshSectionCollection> item = one.second;
         std::shared_ptr<InstanceMeshDrawable> drawable = masterRender.getInstanceMeshDrawable(key);
@@ -260,6 +260,9 @@ bool Chunk::unMakeMeshIfNeeded(MasterRender& masterRender) {
     if (this -> hasLoaded == false) {
         return false;
     }
+    
+    
+    
     return true;
 }
 

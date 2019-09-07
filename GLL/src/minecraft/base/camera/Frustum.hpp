@@ -11,7 +11,6 @@ namespace GLL {
     class AABB {
         
     public:
-        
         AABB(const glm::vec3& dim) : dimensions  (dim) {};
         
         AABB& operator=(const AABB& rhs) {

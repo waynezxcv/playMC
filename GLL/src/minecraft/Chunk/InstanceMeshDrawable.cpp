@@ -153,20 +153,22 @@ void InstanceMeshDrawable::addMeshOffsets(const VectorXZ& xz, const int& section
 
 
 void InstanceMeshDrawable::instanceDraw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) {
+    
     std::lock_guard<std::mutex> lock(this -> mutex);
     // step.1 buffer vao
     if (vaoDataBuffered == false) {
         bufferVaoData();
     }
+    
     // step.2 buffer instance vbo
     std::vector<glm::vec3> combineOffsets;
     for (auto& one : this -> offsetsMap) {
         auto sections = one.second;
         for (auto& two : sections -> sections) {
-            //judge aabb
-//            if (camera -> getFrustum().isBoxInFrustum(two -> aabb) == false) {
-//                continue;
-//            }
+            // step.3 is aabb box in view frustum ??
+            if (camera -> getFrustum().isBoxInFrustum(two -> aabb) == false) {
+                continue;
+            }
             std::vector<glm::vec3> vec = two -> offsets;
             if (vec.size() != 0) {
                 combineOffsets.insert(combineOffsets.end(),vec.begin(), vec.end());
@@ -174,14 +176,14 @@ void InstanceMeshDrawable::instanceDraw(std::shared_ptr<Camera> camera, std::sha
         }
     }
     
-    // step.3 buffer subdata if needed
+    // step.4 buffer subdata if needed
     if (combineOffsets.size() != combineOffsetsSize) {
         combineOffsetsSize = (int)combineOffsets.size();
         glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, combineOffsets.size() * sizeof(glm::vec3), &combineOffsets[0]);
     }
     
-    // step.4 bind texture and draw
+    // step.5 bind texture and draw
     TextureAtlas::sharedInstance().bindTexture();
 #if POLYGON_LINE_ENAGLED
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

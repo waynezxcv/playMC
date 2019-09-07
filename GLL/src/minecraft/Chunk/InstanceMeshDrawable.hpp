@@ -19,7 +19,7 @@
 
 
 namespace GLL {
-    using OffsetsMapType = std::unordered_map<std::string, std::shared_ptr<ChunkMeshSectionCollection>>;
+    
     class InstanceMeshDrawable {
     public:
         InstanceMeshDrawable(const BlockDataContent& blockData ,const ChunkMesh::ChunkMeshFaceDirection& direction);
@@ -43,7 +43,7 @@ namespace GLL {
         std::atomic<bool> vaoDataBuffered{false};
         std::atomic<int> combineOffsetsSize{0};
         
-        OffsetsMapType offsetsMap;
+        MeshOffsetCollectionMapType offsetsMap;
         std::mutex mutex;
         
     private:
