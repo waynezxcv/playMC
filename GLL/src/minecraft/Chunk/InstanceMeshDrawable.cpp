@@ -2,6 +2,8 @@
 
 #include "InstanceMeshDrawable.hpp"
 #include "BlockDataFactory.hpp"
+#include "ChunkManager.hpp"
+
 
 
 using namespace GLL;
@@ -131,43 +133,61 @@ void InstanceMeshDrawable::bufferVaoData() {
     glBindVertexArray(0);
 }
 
-void InstanceMeshDrawable::addMeshOffsets(std::vector<glm::vec3>&& rhs) {
-    std::lock_guard<std::mutex> lock(this -> offsetsMutex);
-    for (auto offset : rhs) {
-        this -> offsets.emplace_back(std::move(offset));
+void InstanceMeshDrawable::addMeshOffsets(const VectorXZ& xz, const int& sectionIndex, const AABB& aabb,  std::vector<glm::vec3> offsetsVector) {
+    std::lock_guard<std::mutex> lock(this -> mutex);
+    std::string key = getKey(xz);
+    bool found = this -> offsetsMap.find(key) != offsetsMap.end();
+    if (found) {
+        std::shared_ptr<ChunkMeshSectionCollection> sectionCollecton = offsetsMap.at(key);
+        sectionCollecton -> sections[sectionIndex] -> aabb = aabb;
+        sectionCollecton -> sections[sectionIndex] -> getMeshOffsets().insert(sectionCollecton -> sections[sectionIndex] -> offsets.end(), offsetsVector.begin(), offsetsVector.end());
     }
-    
-    if (offsets.size() > MAX_OFFSETS_DATA_SIZE) {
-        std::cout<<"[ERROR] the offsets is heap over flow ... "<<std::endl;
+    else {
+        std::shared_ptr<ChunkMeshSectionCollection> sectionCollecton = std::make_shared<ChunkMeshSectionCollection>(xz);
+        sectionCollecton -> sections[sectionIndex] -> aabb = aabb;
+        sectionCollecton -> sections[sectionIndex] -> offsets.insert(sectionCollecton -> sections[sectionIndex] -> offsets.end(), offsetsVector.begin(), offsetsVector.end());
+        std::pair<std::string, std::shared_ptr<ChunkMeshSectionCollection>> pair(key, sectionCollecton);
+        offsetsMap.insert(pair);
     }
-}
-
-void InstanceMeshDrawable::bufferInstanceVboData() {
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, usedInstanceBufferLength * sizeof(glm::vec3), &offsets[0]);
-    usedInstanceBufferLength = (int)offsets.size();
-}
-
-void InstanceMeshDrawable::clearInstanceVboData() {
-    this -> offsets.clear();
 }
 
 
 void InstanceMeshDrawable::instanceDraw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) {
-    
+    std::lock_guard<std::mutex> lock(this -> mutex);
+    // step.1 buffer vao
     if (vaoDataBuffered == false) {
         bufferVaoData();
     }
+    // step.2 buffer instance vbo
+    std::vector<glm::vec3> combineOffsets;
+    for (auto& one : this -> offsetsMap) {
+        auto sections = one.second;
+        for (auto& two : sections -> sections) {
+            //judge aabb
+//            if (camera -> getFrustum().isBoxInFrustum(two -> aabb) == false) {
+//                continue;
+//            }
+            std::vector<glm::vec3> vec = two -> offsets;
+            if (vec.size() != 0) {
+                combineOffsets.insert(combineOffsets.end(),vec.begin(), vec.end());
+            }
+        }
+    }
     
-    std::lock_guard<std::mutex> lock(this -> offsetsMutex);
-    this -> bufferInstanceVboData();
-
+    // step.3 buffer subdata if needed
+    if (combineOffsets.size() != combineOffsetsSize) {
+        combineOffsetsSize = (int)combineOffsets.size();
+        glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, combineOffsets.size() * sizeof(glm::vec3), &combineOffsets[0]);
+    }
+    
+    // step.4 bind texture and draw
     TextureAtlas::sharedInstance().bindTexture();
 #if POLYGON_LINE_ENAGLED
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
     glBindVertexArray(VAO);
-    glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0, usedInstanceBufferLength);
+    glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0, combineOffsetsSize);
     glBindVertexArray(0);
 #if POLYGON_LINE_ENAGLED
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -175,3 +195,21 @@ void InstanceMeshDrawable::instanceDraw(std::shared_ptr<Camera> camera, std::sha
     TextureAtlas::sharedInstance().unbindTexture();
 }
 
+void InstanceMeshDrawable::clearOffsetsFor(VectorXZ&& xz) {
+    std::lock_guard<std::mutex> lock(this -> mutex);
+    std::string key = getKey(xz);
+    bool found = this -> offsetsMap.find(key) != offsetsMap.end();
+    if (found) {
+        auto sections = this -> offsetsMap.at(key);
+        sections -> clear();
+    }
+}
+
+void InstanceMeshDrawable::clearAll() {
+    this -> offsetsMap.clear();
+}
+
+
+std::string InstanceMeshDrawable::getKey(VectorXZ xz) {
+    return std::to_string(xz.x) + std::to_string(xz.z);
+}

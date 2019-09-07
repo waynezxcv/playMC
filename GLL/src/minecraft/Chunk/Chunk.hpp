@@ -11,16 +11,19 @@
 #include "ChunkSection.hpp"
 #include "WorldMapGenerator.hpp"
 #include "VectorXZ.hpp"
+#include "ChunkMeshOffsetsCollection.hpp"
+
 
 
 namespace GLL {
     class ChunkManager;
     class InstanceMeshDrawable;
     class MasterRender;
+    class Camera;
 }
 
-
 namespace GLL {
+    using TempOffsetMapTyep =  std::unordered_map<std::string, std::shared_ptr<ChunkMeshSectionCollection>>;
     
     /// Chunk是一个由16个Section组成的结构，他包含16 * 16 * 16 *16个block
     class Chunk : public std::enable_shared_from_this<Chunk> {
@@ -34,9 +37,9 @@ namespace GLL {
     public:
         Chunk(const GLfloat& x, const GLfloat& z);
         ~Chunk();
-        bool makeMeshIfNeeded(MasterRender& render);
+        bool makeMeshIfNeeded(MasterRender& masterRender, std::shared_ptr<Camera> camera);
         bool unMakeMeshIfNeeded(MasterRender& render);
-
+        
     public:
         /// 遍历chunk中的section
         /// @param callback  回调，会依次返回section，是线程安全的
@@ -71,6 +74,8 @@ namespace GLL {
         
     private:
         std::atomic<bool> hasLoaded {false};
+        std::atomic<bool> isNeedUpdate {true};
+        
         glm::vec2 location;
         std::mutex sectionMapMutex;
         std::unordered_map<int, std::shared_ptr<ChunkSection>> sectionMap;
@@ -92,6 +97,8 @@ namespace GLL {
         std::shared_ptr<Chunk> getRightChunk();
         std::shared_ptr<Chunk> getFrontChunk();
         std::shared_ptr<Chunk> getBackChunk();
+        void onTravesingForMakeMesh(MasterRender& masterRender, VectorXZ&& chunkLocation, const int& sectionIndex, AABB aabb, std::shared_ptr<ChunkBlock> block, TempOffsetMapTyep& tempOffsetsMap);
+        void addMeshOffsetsWithTemp(MasterRender& masterRender, VectorXZ&& chunkLocation, TempOffsetMapTyep& tempOffsetsMap);
     };
 }
 

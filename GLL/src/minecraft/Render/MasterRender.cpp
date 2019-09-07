@@ -1,9 +1,7 @@
 
 #include "MasterRender.hpp"
 
-
 using namespace GLL;
-
 
 MasterRender::MasterRender() :
 skyboxRender(SkyboxRender()),
@@ -18,13 +16,14 @@ textRender(TextRender())
 }
 
 
-
 MasterRender::~MasterRender() {
 }
 
 
 void MasterRender::renderInit() {
 }
+
+
 
 void MasterRender::draw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) {
     // 先画到framebuffer的纹理上
@@ -36,7 +35,9 @@ void MasterRender::draw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuf
 }
 
 
+
 void MasterRender::drawSubRenders(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer) {
+    
     this -> skyboxRender.draw(camera, frameBuffer);
     
 #if TEXT_RENDER_ENABLED
@@ -44,7 +45,7 @@ void MasterRender::drawSubRenders(std::shared_ptr<Camera> camera, std::shared_pt
 #endif
     
     std::lock_guard<std::mutex> lock(this -> instanceMeshesMutex);
-    for (auto one : instanceMeshes) {
+    for (auto& one : instanceMeshes) {
         BlockShaderType shaderType = one.second -> getBlockData().shaderType;
         if (shaderType == BlockShaderType_Chunck) {
             this -> chunkRender.draw(camera, frameBuffer, one.second);
@@ -58,6 +59,7 @@ void MasterRender::drawSubRenders(std::shared_ptr<Camera> camera, std::shared_pt
     }
 }
 
+
 std::shared_ptr<InstanceMeshDrawable> MasterRender::getInstanceMeshDrawable(const std::string& key) {
     std::lock_guard<std::mutex> lock(this -> instanceMeshesMutex);
     if (this -> instanceMeshes.find(key) != this -> instanceMeshes.end()) {
@@ -65,6 +67,8 @@ std::shared_ptr<InstanceMeshDrawable> MasterRender::getInstanceMeshDrawable(cons
     }
     return nullptr;
 }
+
+
 
 void MasterRender::insertInstanceMeshDrawableIfNeeded(std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>>&& pair) {
     std::lock_guard<std::mutex> lock(this -> instanceMeshesMutex);
@@ -82,10 +86,11 @@ void MasterRender::remvoeInstanceMeshDrawableIfNeeded(std::string&& key) {
     }
 }
 
+
+
 void MasterRender::clear() {
     std::lock_guard<std::mutex> lock(this -> instanceMeshesMutex);
     for (auto& one : this -> instanceMeshes) {
-        one.second -> clearInstanceVboData();
+        one.second -> clearAll();
     }
 }
-

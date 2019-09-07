@@ -8,8 +8,17 @@
 
 namespace GLL {
     
-    struct AABB {
-        AABB(const glm::vec3& dim) : dimensions  (dim) {}
+    class AABB {
+        
+    public:
+        
+        AABB(const glm::vec3& dim) : dimensions  (dim) {};
+        
+        AABB& operator=(const AABB& rhs) {
+            this -> position = rhs.position;
+            this -> dimensions = rhs.dimensions;
+            return *this;
+        }
         
         void update(const glm::vec3& location) {
             position = location;
@@ -29,7 +38,6 @@ namespace GLL {
             return res;
         }
         
-        
         glm::vec3 getVP(const glm::vec3& normal) const {
             glm::vec3 res = position;
             
@@ -46,9 +54,11 @@ namespace GLL {
             return res;
         }
         
+    private:
         glm::vec3 position;
-        const glm::vec3 dimensions;
+        glm::vec3 dimensions;
     };
+    
     
     struct Plane {
         float distanceToPoint(const glm::vec3& point) const ;

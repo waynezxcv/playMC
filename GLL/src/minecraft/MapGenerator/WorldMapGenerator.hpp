@@ -41,6 +41,8 @@ namespace GLL {
         
     private:
         static PerlinNoise biomeNoiseGen;
+        
+        
         GrasslandBiome grassBiome;
         TemperateForestBiome temperateForest;
         DesertBiome desertBiome;

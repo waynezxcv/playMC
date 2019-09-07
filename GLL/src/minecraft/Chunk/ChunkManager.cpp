@@ -30,7 +30,6 @@ std::shared_ptr<ChunkBlock> ChunkManager::getBlock(int x,int y,int z) {
     return chunk -> getBlock(x, y, z);
 }
 
-
 std::vector<std::shared_ptr<ChunkBlock>> ChunkManager::getBlocks() {
     std::lock_guard<std::mutex> lock(this -> blocksMutex);
     return this -> blocks;
@@ -45,6 +44,19 @@ void ChunkManager::travesingBlocks(std::function<void(std::shared_ptr<ChunkBlock
         }
     }
 }
+
+#pragma mark - Section
+
+std::shared_ptr<ChunkSection> ChunkManager::getSection(const int& x,const int& z,const int& sectionIndex) {
+    std::lock_guard<std::mutex> lock(this -> chunkMapMutex);
+    VectorXZ xz = Chunk::normalizeChunkCoordination(x, z);
+    if (chunkMap.find(xz) == chunkMap.end()) {
+        return nullptr;
+    }
+    auto chunk = chunkMap[xz];
+    return chunk -> getSection(sectionIndex);
+}
+
 
 #pragma mark - Chunk
 

@@ -25,11 +25,16 @@ namespace GLL {
         friend World;
         
     public:
-        ChunkManager();
-        ~ChunkManager();
+        static ChunkManager* sharedInstance() {
+            static ChunkManager chunkManager;
+            return &chunkManager;
+        }
+
         
         // 获取某个block，如果还没有创建，则会返回nullptr
         std::shared_ptr<ChunkBlock> getBlock(int x,int y,int z);
+        std::shared_ptr<ChunkSection> getSection(const int& x,const int& z,const int& sectionIndex);
+        
         std::vector<std::shared_ptr<ChunkBlock>> getBlocks();
         void travesingBlocks(std::function<void(std::shared_ptr<ChunkBlock>)> callback);
         void traviesingChunks(std::function<void(std::shared_ptr<Chunk>)> renderChunks, std::function<void(std::shared_ptr<Chunk>)> unRenderChunks);
@@ -48,7 +53,9 @@ namespace GLL {
         std::unique_ptr<WorldMapGenerator> worldGenerator;
         std::shared_ptr<Camera> camera;
     private:
-        
+        ~ChunkManager();
+        ChunkManager();
+
         bool loadChunk(int x, int z);
         void unloadChunk(int x, int z);
         bool chunkExistAt(int x, int z);

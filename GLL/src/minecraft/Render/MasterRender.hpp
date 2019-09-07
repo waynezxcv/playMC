@@ -37,7 +37,6 @@ namespace GLL {
         void insertInstanceMeshDrawableIfNeeded(std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>>&& pair);
         void remvoeInstanceMeshDrawableIfNeeded(std::string&& key);
         
-        
         void clear();
     public:
         ChunkRender chunkRender;
@@ -49,8 +48,8 @@ namespace GLL {
 
     private:
         SkyboxRender skyboxRender;
-        std::map<std::string, std::shared_ptr<InstanceMeshDrawable>> instanceMeshes;
         std::mutex instanceMeshesMutex;
+        std::map<std::string, std::shared_ptr<InstanceMeshDrawable>> instanceMeshes;
         
     private:
         void renderInit() override;

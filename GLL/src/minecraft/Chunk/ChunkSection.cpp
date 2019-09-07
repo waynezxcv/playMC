@@ -22,9 +22,13 @@ aabb({CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE})
     aabb.update({positionInWorld.x * CHUNK_SIZE, positionInWorld.y * CHUNK_SIZE, positionInWorld.z * CHUNK_SIZE});
 }
 
-
 ChunkSection::~ChunkSection() {
     
+}
+
+
+AABB& ChunkSection::getAABB() {
+    return aabb;
 }
 
 void ChunkSection::setupBlocks() {
@@ -45,6 +49,7 @@ void ChunkSection::setupBlocks() {
         }
     }
 }
+
 
 void ChunkSection::travesingBlocks(std::function<void(std::shared_ptr<ChunkBlock>)> callback) {
     std::lock_guard<std::mutex> lock(this -> blockArrayMutex);

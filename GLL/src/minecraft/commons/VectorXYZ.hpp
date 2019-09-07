@@ -7,7 +7,6 @@
 #include <functional>
 
 
-
 struct VectorXYZ {
     int x, y , z;
 };

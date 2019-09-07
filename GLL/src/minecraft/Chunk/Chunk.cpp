@@ -7,7 +7,6 @@
 
 using namespace GLL;
 
-
 Chunk::Chunk(const GLfloat& x, const GLfloat& z) :
 location(glm::vec2{x,z}) {}
 
@@ -20,7 +19,6 @@ Chunk::~Chunk() {
 
 
 void Chunk::setupSectionIfNeeded(int index) {
-    
     if (sectionMap.find(index) == sectionMap.end()) {
         std::shared_ptr<Chunk> shared = shared_from_this();
         std::weak_ptr<Chunk> weakSelf = shared;
@@ -31,8 +29,8 @@ void Chunk::setupSectionIfNeeded(int index) {
     
     std::shared_ptr<ChunkSection> section = this -> sectionMap.at(index);
     this -> updateNearestChunkSections(section);
-    
 }
+
 
 void Chunk::setBlock(const BlockId& blockId, GLfloat x,  GLfloat y, GLfloat z) {
     GLuint sectionIndex = y / CHUNK_SIZE;
@@ -46,6 +44,7 @@ void Chunk::setBlock(const BlockId& blockId, GLfloat x,  GLfloat y, GLfloat z) {
     section -> setBlock(blockId, x, bY, z);
     this -> sectionMapMutex.unlock();
     this -> updateHighestBlocks(x, y, z);
+    this -> isNeedUpdate = true;
 }
 
 void Chunk::updateNearestChunkSections(std::shared_ptr<ChunkSection> section) {
@@ -174,56 +173,93 @@ glm::vec2 Chunk::getLocation() const {
     return location;
 }
 
-bool Chunk::makeMeshIfNeeded(MasterRender& masterRender) {
+
+
+bool Chunk::makeMeshIfNeeded(MasterRender& masterRender, std::shared_ptr<Camera> camera) {
+    
     if (this -> hasLoaded == false) {
         return false;
     }
     
-    double startTime = glfwGetTime();
+    if (this -> isNeedUpdate == false) {
+        return false;
+    }
+    this -> isNeedUpdate = false;
     
-    std::map<std::string, std::vector<glm::vec3>> offsetsMap;
+    VectorXZ chunkLocation = VectorXZ{static_cast<int>(this->location.x),static_cast<int>(this->location.y)};
+    TempOffsetMapTyep tempOffsetsMap;
+    
     this -> traversingSections([&](std::shared_ptr<ChunkSection> section) -> void {
+        int sectionIndex = section -> getIndexOfParentChunkSections();
         section -> travesingBlocks([&](std::shared_ptr<ChunkBlock> block) -> void {
-            std::vector<std::shared_ptr<InstanceMesh>> meshes = this -> makeMeshesWithBlock(block);
-            for (auto mesh : meshes) {
-                std::string key = this -> hashWithInstanceMesh(mesh);
-                std::shared_ptr<InstanceMeshDrawable> drawable = masterRender.getInstanceMeshDrawable(key);
-                // create drawable if needed
-                if (drawable == nullptr) {
-                    drawable = std::make_shared<InstanceMeshDrawable>(mesh -> blockData, mesh -> direction);
-                    std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>> pair(key, drawable);
-                    masterRender.insertInstanceMeshDrawableIfNeeded(std::move(pair));
-                }
-                if (offsetsMap.find(key) != offsetsMap.end()) {
-                    offsetsMap[key].emplace_back(std::move(mesh -> offset));
-                }
-                else {
-                    std::vector<glm::vec3> offsets {mesh -> offset};
-                    std::pair<std::string, std::vector<glm::vec3>> pair(key, offsets);
-                    offsetsMap.emplace(std::move(pair));
-                }
-            }
+            this -> onTravesingForMakeMesh(masterRender, std::move(chunkLocation), sectionIndex, section -> getAABB(), block, tempOffsetsMap);
         });
     });
-    
-    
-    startTime = glfwGetTime();
-    
-    
-    for (auto& one : offsetsMap) {
-        std::string key = one.first;
-        std::vector<glm::vec3> offsets = one.second;
-        std::shared_ptr<InstanceMeshDrawable> drawable = masterRender.getInstanceMeshDrawable(key);
-        if (drawable != nullptr) {
-            drawable -> addMeshOffsets(std::move(offsets));
-        }
-    }
+    this -> addMeshOffsetsWithTemp(masterRender, std::move(chunkLocation), tempOffsetsMap);
     return true;
 }
 
+void Chunk::onTravesingForMakeMesh(MasterRender& masterRender,
+                                   VectorXZ&& chunkLocation,
+                                   const int& sectionIndex,
+                                   AABB aabb,
+                                   std::shared_ptr<ChunkBlock> block,
+                                   TempOffsetMapTyep& tempOffsetsMap) {
+    
+    std::vector<std::shared_ptr<InstanceMesh>> meshes = this -> makeMeshesWithBlock(block);
+    for (auto mesh : meshes) {
+        std::string key = this -> hashWithInstanceMesh(mesh);
+        std::shared_ptr<InstanceMeshDrawable> drawable = masterRender.getInstanceMeshDrawable(key);
+        // step.1 create drawable if needed
+        if (drawable == nullptr) {
+            drawable = std::make_shared<InstanceMeshDrawable>(mesh -> blockData, mesh -> direction);
+            std::pair<std::string, std::shared_ptr<InstanceMeshDrawable>> pair(key, drawable);
+            masterRender.insertInstanceMeshDrawableIfNeeded(std::move(pair));
+        }
+        // step.2 clear offsets for this chunk
+        drawable -> clearOffsetsFor(std::move(chunkLocation));
+        // step.3 add offsets to temp map
+        bool found = tempOffsetsMap.find(key) != tempOffsetsMap.end();
+        if (found) {
+            std::shared_ptr<ChunkMeshSectionCollection> sectionCollection = tempOffsetsMap.at(key);
+            auto offsetCollection = sectionCollection -> sections.at(sectionIndex);
+            offsetCollection -> aabb = aabb;
+            offsetCollection -> offsets.emplace_back(std::move( mesh -> offset));
+        }
+        else {
+            std::shared_ptr<ChunkMeshSectionCollection> sectionCollection = std::make_shared<ChunkMeshSectionCollection>(chunkLocation);
+            auto offsetCollection = sectionCollection -> sections.at(sectionIndex);
+            offsetCollection -> aabb = aabb;
+            offsetCollection -> offsets.emplace_back(std::move( mesh -> offset));
+            std::pair<std::string, std::shared_ptr<ChunkMeshSectionCollection>> pair(key, sectionCollection);
+            tempOffsetsMap.insert(pair);
+        }
+    }
+}
+
+void Chunk::addMeshOffsetsWithTemp(MasterRender& masterRender, VectorXZ&& chunkLocation, TempOffsetMapTyep& tempOffsetsMap) {
+    for (auto& one : tempOffsetsMap) {
+        std::string key = one.first;
+        std::shared_ptr<ChunkMeshSectionCollection> item = one.second;
+        std::shared_ptr<InstanceMeshDrawable> drawable = masterRender.getInstanceMeshDrawable(key);
+        if (drawable == nullptr) {
+            continue;
+        }
+        for (auto& two : item -> sections) {
+            int sectionIndex = two -> sectionIndex;
+            std::vector<glm::vec3> offsets = two -> offsets;
+            if (offsets.size() == 0) {
+                continue;
+            }
+            drawable -> addMeshOffsets(chunkLocation, sectionIndex, two -> aabb, offsets);
+        }
+    }
+}
 
 bool Chunk::unMakeMeshIfNeeded(MasterRender& masterRender) {
-    //TODO:移除
+    if (this -> hasLoaded == false) {
+        return false;
+    }
     return true;
 }
 
@@ -317,7 +353,6 @@ std::vector<std::shared_ptr<InstanceMesh>> Chunk::makeMeshesWithBlock(std::share
         mesh2 -> direction =  ChunkMesh::ChunkMeshFaceDirection_ZX;
         mesh2 ->offset = block -> getBlockPositonInWorld();
         meshes.push_back(mesh2);
-        
     }
     return meshes;
 }
@@ -325,7 +360,6 @@ std::vector<std::shared_ptr<InstanceMesh>> Chunk::makeMeshesWithBlock(std::share
 std::string Chunk::hashWithInstanceMesh(std::shared_ptr<InstanceMesh> mesh) {
     return std::to_string(mesh -> blockData.blockId) + std::to_string(mesh -> direction) ;
 }
-
 
 VectorXZ Chunk::normalizeChunkCoordination(int x, int z) {
     int bX = x % CHUNK_SIZE;
@@ -342,7 +376,6 @@ std::shared_ptr<Chunk> Chunk::getLeftChunk() {
     }
     return nullptr;
 }
-
 
 std::shared_ptr<Chunk> Chunk::getRightChunk() {
     std::shared_ptr<Chunk> sp = nullptr;
@@ -362,6 +395,7 @@ std::shared_ptr<Chunk> Chunk::getFrontChunk() {
 }
 
 
+
 std::shared_ptr<Chunk> Chunk::getBackChunk() {
     std::shared_ptr<Chunk> sp = nullptr;
     if ( (sp = this -> backChunk.lock()) ) {
@@ -370,3 +404,4 @@ std::shared_ptr<Chunk> Chunk::getBackChunk() {
     return nullptr;
     
 }
+

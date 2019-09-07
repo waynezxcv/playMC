@@ -16,7 +16,6 @@ namespace GLL {
      */
     using ChunkBlockArrayType = std::array<std::array<std::array<std::shared_ptr<ChunkBlock>, CHUNK_SIZE>, CHUNK_SIZE>, CHUNK_SIZE>;
     
-    
     class ChunkSection : public std::enable_shared_from_this<ChunkSection> {
         friend Chunk;
     public:
@@ -33,8 +32,6 @@ namespace GLL {
         /// @param y 世界坐标y
         /// @param z 世界坐标z
         void setBlock(const BlockId& blockId,const int& x, const int& y, const int& z);
-        
-        
         
         /// 获取某个坐标点上的chunkBlock对象
         /// @param x 世界坐标x
@@ -64,6 +61,8 @@ namespace GLL {
         
         std::weak_ptr<ChunkSection> frontChunkSection;
         std::weak_ptr<ChunkSection> backChunkSection;
+        
+        AABB& getAABB();
 
     private:
         AABB aabb;

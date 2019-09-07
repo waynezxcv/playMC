@@ -22,29 +22,25 @@ namespace GLL {
         std::shared_ptr<Camera> camera;
         
     public:
+        
         World();
         ~World();
         
         void draw(std::shared_ptr<FrameBuffer> frameBuffer);
         MasterRender& getMasterRender();
-        ChunkManager& getChunkManager();
         
     private:
+        std::shared_ptr<Semaphore> semaphore = std::make_shared<Semaphore>(0);
         MasterRender masterRender;
-        ChunkManager chunkManager;
         glm::vec3 playerSpawnPoint;
         FPSCounter fpsCounter;
-        int loadDistance = 2;
         std::mutex mainMutex;
-        std::shared_ptr<Semaphore> semaphore = std::make_shared<Semaphore>(0);
-        
         WorkersManager loadWorkerManager;
         WorkersManager renderWorkerManager;
-        
     private:
         void loadChunks(std::shared_ptr<Camera> camera);
         void renderWorld(std::shared_ptr<FrameBuffer> frameBuffer);
-        void makeMeshInstances();
+        void makeMeshInstances(std::shared_ptr<Camera> camera);
     };
 }
 

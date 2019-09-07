@@ -85,11 +85,9 @@ void Camera::processKeyboard(CameraMovement movement, float deltaTime) {
     update();
 }
 
-
 void Camera::processMouseMovement(double x, double y) {
     // do nothing...
 }
-
 
 void Camera::processMouseLeftButtonDragMovement(double x, double y) {
     
@@ -133,7 +131,7 @@ void Camera::processMouseScroll(double value) {
 
 void Camera::update() {
     
-    glm::vec3 forwad;
+    glm::vec3 forwad {0.0f, 0.0f, 0.0f};
     forwad.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     forwad.y = sin(glm::radians(pitch));
     forwad.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
@@ -143,12 +141,8 @@ void Camera::update() {
     this -> cameraUp = glm::normalize(glm::cross(this -> cameraRight, this -> cameraForward));
     
     this -> viewMatrix = MatrixMaker::makeViewMatrix(this -> cameraPosition, this -> cameraPosition + this -> cameraForward, this -> cameraUp);
-    this -> projectionMatrix = MatrixMaker::makeProjectionMatrix(this -> windowAspect,
-                                                                 this -> fovZoomAngle,
-                                                                 this -> nearClippingDistance,
-                                                                 this -> farClippingDistance);
+    this -> projectionMatrix = MatrixMaker::makeProjectionMatrix(this -> windowAspect,this -> fovZoomAngle,this -> nearClippingDistance,this -> farClippingDistance);
     this -> frustum.update(projectionMatrix * viewMatrix);
-    
     
     if (this -> cameraDidUpdated) {
         this -> cameraDidUpdated();

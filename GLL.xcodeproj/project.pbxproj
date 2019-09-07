@@ -38,6 +38,7 @@
 		0154D93022C1526E000D6755 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0154D92F22C1526E000D6755 /* OpenGL.framework */; };
 		015B3E1A22DA313E0091CBBB /* BasicTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 015B3E1822DA313E0091CBBB /* BasicTexture.cpp */; };
 		015B3E1D22DA31470091CBBB /* CubeTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 015B3E1B22DA31470091CBBB /* CubeTexture.cpp */; };
+		01679B8723241628009D7FA7 /* ChunkMeshOffsetsCollection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01679B8523241628009D7FA7 /* ChunkMeshOffsetsCollection.cpp */; };
 		0174725022D0F306009F5D49 /* Window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0174724F22D0F306009F5D49 /* Window.cpp */; };
 		0174725422D0F533009F5D49 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0174725322D0F533009F5D49 /* Camera.cpp */; };
 		017EAFF32311DE38002EDDB7 /* VectorXZ.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 017EAFF22311DE38002EDDB7 /* VectorXZ.cpp */; };
@@ -557,6 +558,8 @@
 		015B3E1922DA313E0091CBBB /* BasicTexture.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BasicTexture.hpp; sourceTree = "<group>"; };
 		015B3E1B22DA31470091CBBB /* CubeTexture.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CubeTexture.cpp; sourceTree = "<group>"; };
 		015B3E1C22DA31470091CBBB /* CubeTexture.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CubeTexture.hpp; sourceTree = "<group>"; };
+		01679B8523241628009D7FA7 /* ChunkMeshOffsetsCollection.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChunkMeshOffsetsCollection.cpp; sourceTree = "<group>"; };
+		01679B8623241628009D7FA7 /* ChunkMeshOffsetsCollection.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChunkMeshOffsetsCollection.hpp; sourceTree = "<group>"; };
 		0174724F22D0F306009F5D49 /* Window.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Window.cpp; sourceTree = "<group>"; };
 		0174725322D0F533009F5D49 /* Camera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Camera.cpp; sourceTree = "<group>"; };
 		017E803A22EF3F1400D025CD /* Worker.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Worker.hpp; sourceTree = "<group>"; };
@@ -757,10 +760,12 @@
 				019A8B9222E0EAEF0073D2E8 /* ChunkDefine.hpp */,
 				0114913E22E32CCA0043E0F8 /* ChunkManager.hpp */,
 				0114913D22E32CCA0043E0F8 /* ChunkManager.cpp */,
-				0149DAB222E6394D000C3B6C /* InstanceMeshDrawable.hpp */,
-				0149DAB122E6394D000C3B6C /* InstanceMeshDrawable.cpp */,
 				0132A29222E0DECA00385779 /* Chunk.hpp */,
 				0132A29122E0DECA00385779 /* Chunk.cpp */,
+				0149DAB222E6394D000C3B6C /* InstanceMeshDrawable.hpp */,
+				0149DAB122E6394D000C3B6C /* InstanceMeshDrawable.cpp */,
+				01679B8623241628009D7FA7 /* ChunkMeshOffsetsCollection.hpp */,
+				01679B8523241628009D7FA7 /* ChunkMeshOffsetsCollection.cpp */,
 				0132A29522E0DED500385779 /* ChunkSection.hpp */,
 				0132A29422E0DED500385779 /* ChunkSection.cpp */,
 				0132A29822E0DEDD00385779 /* ChunkBlock.hpp */,
@@ -1368,8 +1373,8 @@
 				0101F76B22F54DB1004C5381 /* FPSCounter.cpp */,
 				017EAFF12311DE38002EDDB7 /* VectorXZ.hpp */,
 				017EAFF22311DE38002EDDB7 /* VectorXZ.cpp */,
-				01455A1822FEF1C800DC9EA4 /* VectorXYZ.hpp */,
 				01455A1722FEF1C800DC9EA4 /* VectorXYZ.cpp */,
+				01455A1822FEF1C800DC9EA4 /* VectorXYZ.hpp */,
 				010E872822E4B32D00455494 /* Array2D.hpp */,
 				0126673A23175E5900965C8C /* Semaphore.hpp */,
 				0126673923175E5900965C8C /* Semaphore.cpp */,
@@ -1632,6 +1637,7 @@
 				0174725422D0F533009F5D49 /* Camera.cpp in Sources */,
 				013DE59B22C1543B00A22DD5 /* Shader.cpp in Sources */,
 				01CA401C22E47E8A002BB400 /* TextRender.cpp in Sources */,
+				01679B8723241628009D7FA7 /* ChunkMeshOffsetsCollection.cpp in Sources */,
 				017EB010231226E8002EDDB7 /* LightForestBiome.cpp in Sources */,
 				0114913F22E32CCA0043E0F8 /* ChunkManager.cpp in Sources */,
 				01FA33A522C8A2F400C76D08 /* FrameBufferCache.cpp in Sources */,

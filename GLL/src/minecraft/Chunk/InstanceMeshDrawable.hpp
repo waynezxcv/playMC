@@ -14,43 +14,44 @@
 #include "FrameBuffer.hpp"
 #include "BlockData.hpp"
 #include "Chunk.hpp"
+#include "ChunkMeshOffsetsCollection.hpp"
 
 
 
 namespace GLL {
-    
+    using OffsetsMapType = std::unordered_map<std::string, std::shared_ptr<ChunkMeshSectionCollection>>;
     class InstanceMeshDrawable {
     public:
         InstanceMeshDrawable(const BlockDataContent& blockData ,const ChunkMesh::ChunkMeshFaceDirection& direction);
         ~InstanceMeshDrawable();
         
-        void addMeshOffsets(std::vector<glm::vec3>&& offsets);
+        void addMeshOffsets(const VectorXZ& xz, const int& sectionIndex, const AABB& aabb,  std::vector<glm::vec3> offsetsVector);
+        
+        void clearOffsetsFor(VectorXZ&& xz);
+        void clearAll();
         
         void instanceDraw(std::shared_ptr<Camera> camera, std::shared_ptr<FrameBuffer> frameBuffer);
         BlockDataContent getBlockData() const;
         
-        void clearInstanceVboData();
-
     private:
         BlockDataContent blockData;
         ChunkMesh::ChunkMeshFaceDirection direction;
         std::vector<ChunkMesh::ChunkMeshVertex> vertices;
-
+        
         GLuint VAO, VBO, EBO = 0;
         GLuint instanceVBO = 0;
         std::atomic<bool> vaoDataBuffered{false};
-        std::atomic<int> usedInstanceBufferLength {0};
+        std::atomic<int> combineOffsetsSize{0};
         
-        std::vector<glm::vec3> offsets;
-        std::mutex offsetsMutex;
-                
+        OffsetsMapType offsetsMap;
+        std::mutex mutex;
+        
     private:
         void makeVertices(const std::vector<glm::vec3>& face, const std::vector<glm::vec2>& texCoords, const GLfloat& cardinalLight);
         void bufferVaoData();
-        void bufferInstanceVboData();
+        std::string getKey(VectorXZ xz);
     };
 }
-
 
 namespace GLL {
     class InstanceMeshDrawableFactory {
@@ -60,5 +61,6 @@ namespace GLL {
         }
     };
 }
+
 
 #endif /* InstanceMeshDrawable_hpp */

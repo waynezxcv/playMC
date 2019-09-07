@@ -61,9 +61,10 @@ void ViewFrustum::update(const glm::mat4& mat) noexcept {
         plane.distanceToOrigin /= length;
     }
     
-}
+} 
 
 bool ViewFrustum::isBoxInFrustum(const AABB& box) const noexcept {
+#if AABB_TEST_ENABLED
     bool result = true;
     for (auto& plane : m_planes) {
         if (plane.distanceToPoint(box.getVP(plane.normal)) < 0) {
@@ -74,5 +75,8 @@ bool ViewFrustum::isBoxInFrustum(const AABB& box) const noexcept {
         }
     }
     return result;
+#else
+    return true;
+#endif
 }
 
